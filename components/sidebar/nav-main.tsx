@@ -17,9 +17,12 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { DataPages, Pages } from "@/data/pages"
+import { Dispatch, SetStateAction } from "react"
 
 export function NavMain({
   items,
+	setDataPage
 }: {
   items: {
     title: string
@@ -28,10 +31,22 @@ export function NavMain({
     isActive?: boolean
     items?: {
       title: string
-      url: string
+      page: Pages,
+			dataId?: number
     }[]
-  }[]
+  }[],
+	setDataPage: Dispatch<SetStateAction<DataPages>>
 }) {
+
+	const handlePageUpdate = (page:Pages, dataId?:number) => {
+		console.log("SET PAGE")
+		if (dataId){
+			setDataPage({page:page, dataId:dataId})
+		} else {
+			setDataPage({page:page})
+		}
+	}
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -56,9 +71,7 @@ export function NavMain({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </a>
+												<span onClick={() => handlePageUpdate(subItem.page, subItem.dataId)}>{subItem.title}</span>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

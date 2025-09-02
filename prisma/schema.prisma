@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
@@ -15,6 +9,34 @@ datasource db {
 }
 
 model Character {
-  id   Int    @id
-  name String
+  id                                   Int    @id
+  name                                 String
+  title                                String
+  age                                  Int
+  mainClassId                          Int
+  secondClassId                        Int?
+  Class_Character_mainClassIdToClass   Class  @relation("Character_mainClassIdToClass", fields: [mainClassId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Character_classId_fkey")
+  Class_Character_secondClassIdToClass Class? @relation("Character_secondClassIdToClass", fields: [secondClassId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([mainClassId], map: "fki_class")
+  @@index([secondClassId], map: "fki_second_class")
+}
+
+model Class {
+  id                                       Int           @id
+  name                                     String
+  classCategoryId                          Int
+  description                              String
+  Character_Character_mainClassIdToClass   Character[]   @relation("Character_mainClassIdToClass")
+  Character_Character_secondClassIdToClass Character[]   @relation("Character_secondClassIdToClass")
+  ClassCategory                            ClassCategory @relation(fields: [classCategoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([classCategoryId], map: "fki_class_category")
+}
+
+model ClassCategory {
+  id          Int     @id
+  name        String
+  description String
+  Class       Class[]
 }
