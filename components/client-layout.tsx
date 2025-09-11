@@ -6,6 +6,10 @@ import { AppSidebar } from "./sidebar/app-sidebar";
 import { Separator } from "./ui/separator";
 import { Character, Class, ClassCategory } from "@prisma/client"
 import { DataPages, Pages } from "@/data/pages";
+import { CharacterClass } from "./character-class/character-class";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { LoginForm } from "./login-form";
 
 interface ClientLayoutProps {
 	characters:Character[],
@@ -26,25 +30,44 @@ export function ClientLayout(
 
 
 	return(
+	<Dialog>
 		<SidebarProvider>
-			<AppSidebar characters={characters} classcategories={classCategories} classes={classes} setDataPage={setDataPage} />
-			<SidebarInset>
-				<header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-					<div className="flex items-center gap-2 px-4">
-						<SidebarTrigger className="-ml-1" />
-						<Separator
-							orientation="vertical"
-							className="mr-2 data-[orientation=vertical]:h-4"
-						/>
+				<AppSidebar characters={characters} classcategories={classCategories} classes={classes} setDataPage={setDataPage} />
+				<SidebarInset>
+					<header className="p-10 justify-between flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+
+						<div className="flex items-center gap-2 px-4">
+							<SidebarTrigger className="-ml-1" />
+							<Separator
+								orientation="vertical"
+								className="mr-2 data-[orientation=vertical]:h-4"
+							/>
+						</div>
+							<DialogTrigger asChild>
+								<Button className="cursor-pointer">Connecte toi bébou :3</Button>
+							</DialogTrigger>
+					</header>
+					<DialogContent>
+						<DialogTitle className="sr-only"/>
+						<LoginForm />
+					</DialogContent>
+					<div className="flex flex-1 flex-col gap-4 p-14 pt-0">
+						{dataPage.page == Pages.Home? <h1>Home</h1> : null}
+						{dataPage.page == Pages.Character? <h1>Character</h1> : null}
+						{
+							dataPage.page == Pages.Class && dataPage.dataId
+							?
+								<CharacterClass
+									classes={classes.filter((characterClass:Class)=>characterClass.classCategoryId == dataPage.dataId)}
+									category={classCategories.filter((category:ClassCategory)=>category.id == dataPage.dataId)[0]}
+								/>
+							: null
+						}
+						{dataPage.page == Pages.World? <h1>World</h1> : null}
 					</div>
-				</header>
-				<div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-					{dataPage.page == Pages.Home? <h1>Home</h1> : null}
-					{dataPage.page == Pages.Character? <h1>Character</h1> : null}
-					{dataPage.page == Pages.Class? <h1>Class</h1> : null}
-					{dataPage.page == Pages.World? <h1>World</h1> : null}
-				</div>
-			</SidebarInset>
+				</SidebarInset>
 		</SidebarProvider>
+			</Dialog>
+
 	)
 }

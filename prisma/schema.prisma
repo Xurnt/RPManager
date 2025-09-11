@@ -9,14 +9,36 @@ datasource db {
 }
 
 model Character {
-  id                                   Int    @id
+  id                                   Int     @id
   name                                 String
   title                                String
   age                                  Int
   mainClassId                          Int
   secondClassId                        Int?
-  Class_Character_mainClassIdToClass   Class  @relation("Character_mainClassIdToClass", fields: [mainClassId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Character_classId_fkey")
-  Class_Character_secondClassIdToClass Class? @relation("Character_secondClassIdToClass", fields: [secondClassId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vitality                             Int?
+  mana                                 Int?
+  strength                             Int?
+  dexterity                            Int?
+  courage                              Int?
+  charisma                             Int?
+  perception                           Int?
+  discretion                           Int?
+  knowledge                            Int?
+  destiny                              Int?
+  publicStory                          String?
+  privateStory                         String?
+  motivations                          String?
+  fears                                String?
+  like                                 String?
+  dislike                              String?
+  talentName                           String?
+  weaknessName                         String?
+  inventory                            String?
+  talentDescription                    String?
+  weaknessDescription                  String?
+  Class_Character_mainClassIdToClass   Class   @relation("Character_mainClassIdToClass", fields: [mainClassId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Character_classId_fkey")
+  Class_Character_secondClassIdToClass Class?  @relation("Character_secondClassIdToClass", fields: [secondClassId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User                                 User[]
 
   @@index([mainClassId], map: "fki_class")
   @@index([secondClassId], map: "fki_second_class")
@@ -39,4 +61,20 @@ model ClassCategory {
   name        String
   description String
   Class       Class[]
+}
+
+model User {
+  id          Int        @id
+  name        String
+  password    String
+  roleId      Int
+  characterId Int?
+  Character   Character? @relation(fields: [characterId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  UserRole    UserRole   @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model UserRole {
+  id   Int    @id
+  role String
+  User User[]
 }

@@ -26,12 +26,11 @@ export function NavMain({
 }: {
   items: {
     title: string
-    url: string
+		page: Pages,
     icon?: LucideIcon
     isActive?: boolean
     items?: {
       title: string
-      page: Pages,
 			dataId?: number
     }[]
   }[],
@@ -49,7 +48,6 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
@@ -60,23 +58,32 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
+								{item.items?
+									<SidebarMenuButton className="cursor-pointer" tooltip={item.title}>
+										{item.icon && <item.icon />}
+												<span>{item.title}</span>
+												<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+									</SidebarMenuButton>
+									:
+									<SidebarMenuButton onClick={() => handlePageUpdate(item.page)} className="cursor-pointer" tooltip={item.title}>
+										{item.icon && <item.icon />}
+												<span>{item.title}</span>
+									</SidebarMenuButton>
+
+								}
+
               </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-												<span onClick={() => handlePageUpdate(subItem.page, subItem.dataId)}>{subItem.title}</span>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
+							{item.items?.map((subItem) => (
+								<CollapsibleContent key={subItem.title}>
+									<SidebarMenuSub>
+											<SidebarMenuSubItem key={subItem.title}>
+												<SidebarMenuSubButton className="cursor-pointer" asChild>
+													<span onClick={() => handlePageUpdate(item.page, subItem.dataId)}>{subItem.title}</span>
+												</SidebarMenuSubButton>
+											</SidebarMenuSubItem>
+									</SidebarMenuSub>
+								</CollapsibleContent>
+							))}
             </SidebarMenuItem>
           </Collapsible>
         ))}

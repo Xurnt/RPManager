@@ -28,15 +28,21 @@ export function AppSidebar({ ...props }: DataDrivenSidebar) {
 
 	const data = {
   navMain: [
+		{
+     	title: "Aventure",
+			page: Pages.Home,
+      url: "#",
+      icon: SquareTerminal,
+		},
     {
       title: "Personnages",
       url: "#",
       icon: SquareTerminal,
+			page: Pages.Character,
       items: props.characters.map(
 				(character:Character) => (
 					{
 						title: character.name,
-						page: Pages.Character,
 						dataId: character.id
 					}
 				)
@@ -46,11 +52,11 @@ export function AppSidebar({ ...props }: DataDrivenSidebar) {
       title: "Classes",
       url: "#",
       icon: Bot,
+			page: Pages.Class,
       items: props.classcategories.map(
 				(classCategory:ClassCategory) => (
 					{
 						title: classCategory.name,
-						page: Pages.Class,
 						dataId: classCategory.id
 					}
 				)
@@ -60,22 +66,19 @@ export function AppSidebar({ ...props }: DataDrivenSidebar) {
       title: "Univers",
       url: "#",
       icon: BookOpen,
+			page: Pages.World,
       items: [
         {
           title: "Introduction",
-          page: Pages.World,
         },
         {
           title: "Get Started",
-          page: Pages.World,
         },
         {
           title: "Tutorials",
-          page: Pages.World,
         },
         {
           title: "Changelog",
-          page: Pages.World,
         },
       ],
     }

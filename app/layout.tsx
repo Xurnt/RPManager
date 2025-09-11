@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { PrismaClient } from "@prisma/client";
+import { ThemeProvider } from "@/components/theme-provider";
 const prisma = new PrismaClient();
 
 const geistSans = Geist({
@@ -27,8 +28,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fr" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+					<ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          ></ThemeProvider>
 				{children}
       </body>
     </html>
