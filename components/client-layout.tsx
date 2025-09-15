@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar } from "./sidebar/app-sidebar";
 import { Separator } from "./ui/separator";
@@ -8,16 +8,20 @@ import { Character, Class, ClassCategory } from "@prisma/client"
 import { DataPages, Pages } from "@/data/pages";
 import { CharacterClass } from "./character-class/character-class";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { LoginForm } from "./login-form";
+import { CookiesProvider, useCookies } from 'react-cookie';
 
-interface ClientLayoutProps {
+export interface ClientLayoutProps {
 	characters:Character[],
 	classCategories:ClassCategory[],
 	classes:Class[]
 }
 
-
+interface UserData {
+	userId: number,
+	characterId?: number
+}
 
 export function ClientLayout(
 	{
@@ -27,10 +31,30 @@ export function ClientLayout(
 	}:ClientLayoutProps
 ):ReactElement {
 	const [dataPage, setDataPage] = useState<DataPages>({page:Pages.Home})
+	const [loginDialogOpen, setLoginDialogOpen] = useState<boolean>(false)
+	const [userData, setUserData] = useState<UserData|null>(null)
+	const cookie = useCookies()
 
+  useEffect(() => {
+    fetch('/api/jwt')
+      .then((res) => res.json())
+      .then((data) => {
+				if (data.userId) {
+					const userData:UserData={
+						userId:data.userId,
+						characterId:data.characterId,
+					}
+					setUserData(userData)
+				}
+				else {
+					setUserData(null)
+				}
+			})
+  }, [cookie])
 
 	return(
-	<Dialog>
+
+	<Dialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen}>
 		<SidebarProvider>
 				<AppSidebar characters={characters} classcategories={classCategories} classes={classes} setDataPage={setDataPage} />
 				<SidebarInset>
@@ -43,13 +67,16 @@ export function ClientLayout(
 								className="mr-2 data-[orientation=vertical]:h-4"
 							/>
 						</div>
+						{userData ? <h1>Connecté</h1>:
 							<DialogTrigger asChild>
 								<Button className="cursor-pointer">Connecte toi bébou :3</Button>
 							</DialogTrigger>
+						}
+
 					</header>
 					<DialogContent>
 						<DialogTitle className="sr-only"/>
-						<LoginForm />
+						<LoginForm setLoginDialogOpen={setLoginDialogOpen} />
 					</DialogContent>
 					<div className="flex flex-1 flex-col gap-4 p-14 pt-0">
 						{dataPage.page == Pages.Home? <h1>Home</h1> : null}
@@ -67,7 +94,8 @@ export function ClientLayout(
 					</div>
 				</SidebarInset>
 		</SidebarProvider>
-			</Dialog>
-
+		</Dialog>
 	)
 }
+
+

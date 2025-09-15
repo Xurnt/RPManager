@@ -10,12 +10,14 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FormEvent } from "react"
+import { Dispatch, FormEvent, SetStateAction } from "react"
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+
+interface LoginFormType {
+	setLoginDialogOpen: Dispatch<SetStateAction<boolean>>
+}
+
+export function LoginForm({setLoginDialogOpen}:LoginFormType) {
 
  
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -32,7 +34,7 @@ export function LoginForm({
     })
  
     if (response.ok) {
-			console.log("Yipee")
+			setLoginDialogOpen(false)
     } else {
       // Handle errors
     }

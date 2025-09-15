@@ -1,5 +1,5 @@
 "use server"
-import { ClientLayout } from "@/components/client-layout";
+import ClientProviders from "@/components/client-providers";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -11,6 +11,6 @@ export default async function Home() {
 	const classes= await prisma.class.findMany();
 	
   return (
-		<ClientLayout characters={characters} classCategories={classCategories} classes={classes} />
+		<ClientProviders characters={characters} classCategories={classCategories} classes={classes} />
   );
 }
