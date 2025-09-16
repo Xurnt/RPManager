@@ -33,8 +33,7 @@ export function ClientLayout(
 	const [dataPage, setDataPage] = useState<DataPages>({page:Pages.Home})
 	const [loginDialogOpen, setLoginDialogOpen] = useState<boolean>(false)
 	const [userData, setUserData] = useState<UserData|null>(null)
-	const cookie = useCookies()
-
+	const [cookie, setCookie] = useCookies(['jwt'])
   useEffect(() => {
     fetch('/api/jwt')
       .then((res) => res.json())

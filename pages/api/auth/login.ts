@@ -26,7 +26,7 @@ export default async function handler(
 		if (jwtSecretKey) {
 			const token = jwt.sign(data, jwtSecretKey);
 			const cookie = serialize("jwt", token, {
-				httpOnly: true,
+				httpOnly: false,
 				secure: process.env.NODE_ENV === "production",
 				maxAge: 60 * 60 * 24 * 7, // One week
 				path: "/",
