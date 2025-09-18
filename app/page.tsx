@@ -9,8 +9,14 @@ export default async function Home() {
 	const characters= await prisma.character.findMany();
 	const classCategories= await prisma.classCategory.findMany();
 	const classes= await prisma.class.findMany();
+	const users= await prisma.user.findMany({
+		relationLoadStrategy: "join",
+		include: {
+			UserRole: true,
+		},
+	});
 	
   return (
-		<ClientProviders characters={characters} classCategories={classCategories} classes={classes} />
+		<ClientProviders users={users} characters={characters} classCategories={classCategories} classes={classes} />
   );
 }

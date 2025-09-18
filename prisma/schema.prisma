@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  provider        = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -9,35 +10,38 @@ datasource db {
 }
 
 model Character {
-  id                                   Int     @id
+  id                                   Int    @id
   name                                 String
   title                                String
   age                                  Int
   mainClassId                          Int
   secondClassId                        Int?
-  vitality                             Int?
-  mana                                 Int?
-  strength                             Int?
-  dexterity                            Int?
-  courage                              Int?
-  charisma                             Int?
-  perception                           Int?
-  discretion                           Int?
-  knowledge                            Int?
-  destiny                              Int?
-  publicStory                          String?
-  privateStory                         String?
-  motivations                          String?
-  fears                                String?
-  like                                 String?
-  dislike                              String?
-  talentName                           String?
-  weaknessName                         String?
-  inventory                            String?
-  talentDescription                    String?
-  weaknessDescription                  String?
-  Class_Character_mainClassIdToClass   Class   @relation("Character_mainClassIdToClass", fields: [mainClassId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Character_classId_fkey")
-  Class_Character_secondClassIdToClass Class?  @relation("Character_secondClassIdToClass", fields: [secondClassId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vitality                             Int
+  mana                                 Int
+  strength                             Int
+  dexterity                            Int
+  courage                              Int
+  charisma                             Int
+  perception                           Int
+  discretion                           Int
+  knowledge                            Int
+  destiny                              Int
+  publicStory                          String
+  privateStory                         String
+  motivations                          String
+  fears                                String
+  like                                 String
+  dislike                              String
+  talentName                           String
+  weaknessName                         String
+  inventory                            String
+  talentDescription                    String
+  weaknessDescription                  String
+  picturePath                          String
+  currentVitality                      Int
+  currentMana                          Int
+  Class_Character_mainClassIdToClass   Class  @relation("Character_mainClassIdToClass", fields: [mainClassId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Character_classId_fkey")
+  Class_Character_secondClassIdToClass Class? @relation("Character_secondClassIdToClass", fields: [secondClassId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   User                                 User[]
 
   @@index([mainClassId], map: "fki_class")
