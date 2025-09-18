@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start"
+    "start": "dotenv -- bash -c 'next start -p $PORT'"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
@@ -21,6 +21,7 @@
     "clsx": "^2.1.1",
     "cookie": "^1.0.2",
     "dotenv": "^17.2.2",
+    "dotenv-cli": "^10.0.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.542.0",
     "next": "15.5.2",
