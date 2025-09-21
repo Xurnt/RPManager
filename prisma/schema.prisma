@@ -73,6 +73,7 @@ model User {
   password    String
   roleId      Int
   characterId Int?
+  isConnected Boolean    @default(false)
   Character   Character? @relation(fields: [characterId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   UserRole    UserRole   @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -81,4 +82,10 @@ model UserRole {
   id   Int    @id
   role String
   User User[]
+}
+
+model GameSession {
+  isActive                    Boolean
+  isCharacterSelectionAllowed Boolean
+  id                          Int     @id
 }

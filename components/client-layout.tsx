@@ -4,7 +4,7 @@ import { ReactElement, useEffect, useState } from "react";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar } from "./sidebar/app-sidebar";
 import { Separator } from "./ui/separator";
-import { Character, Class, ClassCategory, User, UserRole } from "@prisma/client"
+import { Character, Class, ClassCategory, GameSession, User, UserRole } from "@prisma/client"
 import { DataPages, Pages } from "@/data/pages";
 import { CharacterClass } from "./character-class/character-class";
 import { Button } from "./ui/button";
@@ -17,13 +17,15 @@ import { PlayerLayout } from "./adventure/player-layout";
 export interface ClientLayoutProps {
 	characters:Character[],
 	classCategories:ClassCategory[],
-	classes:Class[]
-	users: (User & {UserRole:UserRole})[]
+	classes:Class[],
+	users: (User & {UserRole:UserRole})[],
+	gameSession: GameSession | null
 }
 
 export interface UserData {
 	userId: number,
-	characterId?: number
+	characterId?: number,
+	role: string
 }
 
 export function ClientLayout(
@@ -31,29 +33,48 @@ export function ClientLayout(
 		characters,
 		classCategories,
 		classes,
-		users
+		users,
+		gameSession
 	}:ClientLayoutProps
 ):ReactElement {
 	const [dataPage, setDataPage] = useState<DataPages>({page:Pages.Home})
 	const [loginDialogOpen, setLoginDialogOpen] = useState<boolean>(false)
 	const [userData, setUserData] = useState<UserData|null>(null)
-	const [cookie] = useCookies(['jwt'])
+	const [cookie,setCookie, removeCookie] = useCookies(['jwt'])
   useEffect(() => {
-    fetch('/api/jwt')
-      .then((res) => res.json())
-      .then((data) => {
-				if (data.userId) {
-					const userData:UserData={
-						userId:data.userId,
-						characterId:data.characterId,
+		if (cookie.jwt) {
+			fetch('/api/jwt')
+				.then((res) => res.json())
+				.then((data) => {
+					if (data.userId) {
+						const userData:UserData={
+							userId:data.userId,
+							characterId:data.characterId,
+							role:users.filter((user) => user.id == data.userId)[0].UserRole.role
+						}
+						setUserData(userData)
 					}
-					setUserData(userData)
-				}
-				else {
-					setUserData(null)
-				}
-			})
+					else {
+						setUserData(null)
+					}
+				})
+			} else if (userData){
+				setUserData(null)
+			}
   }, [cookie])
+	console.log(gameSession)
+	 async function disconnect () {
+		if(userData){
+			const response = await fetch('/api/auth/logout', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ userId:userData.userId }),
+			})
+			if (response.status == 200) {
+				removeCookie("jwt", {path:"/"})
+			}
+		}
+	}
 
 	return(
 
@@ -70,9 +91,9 @@ export function ClientLayout(
 								className="mr-2 data-[orientation=vertical]:h-4"
 							/>
 						</div>
-						{userData ? <h1>Connecté</h1>:
+						{userData ? <Button onClick={disconnect} className="cursor-pointer">{"Tu te déconnetes ??? 😞"}</Button>:
 							<DialogTrigger asChild>
-								<Button className="cursor-pointer">Connecte toi bébou :3</Button>
+								<Button className="cursor-pointer">Connecte toi bébou 😗</Button>
 							</DialogTrigger>
 						}
 
@@ -82,13 +103,11 @@ export function ClientLayout(
 						<LoginForm setLoginDialogOpen={setLoginDialogOpen} />
 					</DialogContent>
 					<div className="flex flex-1 flex-col gap-4 p-14 pt-0">
-						{dataPage.page == Pages.Home? (
-							userData ? (
-								users.filter((user) => user.id == userData?.userId)[0].UserRole.role == "dm"
-								? <DmLayout />
-								: <PlayerLayout users={users} characters={characters} userData={userData} />
-							) : null
-						): null
+						{dataPage.page == Pages.Home?
+							gameSession?
+								<PlayerLayout gameSession={gameSession} users={users} characters={characters} userData={userData} />
+								:null
+							:null
 						}
 						{dataPage.page == Pages.Character? <h1>Character</h1> : null}
 						{

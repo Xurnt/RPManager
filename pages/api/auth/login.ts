@@ -18,6 +18,9 @@ export default async function handler(
 				password: password,
 			},
 		});
+		if (user[0].isConnected) {
+			throw new Error("Utilisateur déjà connecté");
+		}
 
 		var data = {
 			userId: user[0].id,
@@ -31,7 +34,14 @@ export default async function handler(
 				maxAge: 60 * 60 * 24 * 7, // One week
 				path: "/",
 			});
-
+			await prisma.user.update({
+				where: {
+					id: user[0].id,
+				},
+				data: {
+					isConnected: true,
+				},
+			});
 			res.setHeader("Set-Cookie", cookie);
 			res.status(200).json({
 				success: true,
