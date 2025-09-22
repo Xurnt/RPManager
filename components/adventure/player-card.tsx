@@ -10,17 +10,43 @@ import {
 import { Character, User } from "@prisma/client"
 import Image from 'next/image'
 import { Progress } from "../ui/progress"
+import { UserData } from "../client-layout"
+import { Dispatch, SetStateAction } from "react"
 interface PlayerCardProps {
 	character:Character
 	user: User,
 	isCurrentUser:boolean,
-	isPlayerConnected:boolean,
-	className?:string
+	isUserDm:boolean,
+	className?:string,
+	setInteractionTargets:Dispatch<SetStateAction<Character[]>>
+	interactionTargets:Character[],
+	newInteraction:boolean
 }
 
-export function PlayerCard({character,user, isCurrentUser, isPlayerConnected, className} : PlayerCardProps){
+export function PlayerCard(
+	{
+		character,
+		user,
+		isCurrentUser,
+		isUserDm,
+		className,
+		setInteractionTargets,
+		interactionTargets,
+		newInteraction
+	} : PlayerCardProps){
+
+		const addNewInteractionTarget = () => {
+			if (newInteraction && interactionTargets.filter((interactionTarget) => interactionTarget.id == character.id).length == 0) {
+				setInteractionTargets([...interactionTargets, character])
+			}
+		}
+
+
 	return(
-<Card className={className + "flex max-h-full flex-col justify-stretch align-end gap-0 " + (isCurrentUser? "h-full flex-3": "")}>
+<Card
+	className={className + "flex max-h-full flex-col justify-stretch align-end gap-0 " + (isCurrentUser? "h-full flex-3": "") + (isUserDm ? "cursor-pointer" : "")}
+	onClick={addNewInteractionTarget}
+>
   <CardHeader className="flex flex-1 flex-col justify-around items-center">
     <CardTitle className={"text-center " + (isCurrentUser? "text-3xl": "text-base")}>{character.name}</CardTitle>
     <CardDescription className={"text-center " + (isCurrentUser? "text-base": "text-xs")}>{user.name}</CardDescription>

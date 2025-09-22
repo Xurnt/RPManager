@@ -11,7 +11,6 @@ export default async function handler(
 		if (jwtSecretKey && jwtToken) {
 			const verified = jwt.verify(jwtToken, jwtSecretKey);
 			if (verified) {
-				console.log(verified);
 				return res.status(200).json(verified);
 			} else {
 				// Access Denied

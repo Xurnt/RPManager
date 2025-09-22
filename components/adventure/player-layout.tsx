@@ -2,7 +2,7 @@ import { Character, GameSession, User } from "@prisma/client";
 import { PlayerCard } from "./player-card";
 import { UserData } from "../client-layout";
 import { useEffect, useState } from "react";
-import { GameManager } from "./game-manager";
+import { GameManager } from "./game-manager/game-manager";
 
 interface PlayerLayoutProps {
 	users: User[]
@@ -25,6 +25,8 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 	const [currentUserCharacter, setCurrentUserCharacter] = useState<Character|null>(findCurrentCharacter(characters, userData))
 	const [leftSideCharacters, setLeftSideCharacters] = useState<Character[]>([])
 	const [rightSideCharacters, setRightSideCharacters] = useState<Character[]>([])
+	const [interactionTargets, setInteractionTargets] = useState<Character[]>([])
+	const [newInteraction, setNewInteraction] = useState<boolean>(false)
 
 
 	useEffect(() => {
@@ -40,7 +42,6 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 					var leftSideCharactersTemp:Character[]=[]
 					if (tempCharacters.length % 2 == 0) {
 						leftSideCharactersTemp= tempCharacters.splice(1, tempCharacters.length / 2)
-						
 					} else {
 						leftSideCharactersTemp= tempCharacters.splice(1, (tempCharacters.length + 1) / 2)
 					}
@@ -62,8 +63,17 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 		<div  className="flex flex-1 flex-col justify-around items-center gap-5">
 			<div className="p-5 w-full h-1/2">
 				{gameSession
-					?<GameManager userData={userData} gameSession={gameSession} />
-					:null
+					?
+						<GameManager
+							userData={userData}
+							gameSession={gameSession} 
+							setNewInteraction={setNewInteraction}
+							interactionTargets={interactionTargets}
+							newInteraction={newInteraction}
+							setInteractionTargets={setInteractionTargets}
+						/>
+					:
+						null
 				}
 				
 			</div>
@@ -71,20 +81,48 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 				{
 					leftSideCharacters.map((character) => {
 						return (users.filter((user) => user.characterId == character.id).map((user) => (
-							<PlayerCard className={"max-w-1/" + (characters.length + 1).toString()} key={"playerCharacter" + character.id} user={user} character={character} isCurrentUser={false} isPlayerConnected={userData != null} />
+							<PlayerCard
+								className={"max-w-1/" + (characters.length + 1).toString()}
+								key={"playerCharacter" + character.id}
+								user={user}
+								character={character}
+								isCurrentUser={false}
+								isUserDm={userData?.role == "dm"}
+								interactionTargets={interactionTargets}
+								newInteraction={newInteraction}
+								setInteractionTargets={setInteractionTargets}
+							/>
 						)))
 					})
 				}
 				{ currentUser
 					? currentUserCharacter
-						?	<PlayerCard className={"max-w-2/" + (characters.length + 1).toString()} user={currentUser} character={currentUserCharacter} isCurrentUser={true} isPlayerConnected={userData != null} />
+						?	<PlayerCard
+							className={"max-w-2/" + (characters.length + 1).toString()}
+							user={currentUser}
+							character={currentUserCharacter}
+							isCurrentUser={true}
+							isUserDm={userData?.role == "dm"}
+							interactionTargets={interactionTargets}
+							newInteraction={newInteraction}
+							setInteractionTargets={setInteractionTargets}
+						/>
 						:null
 					:null
 				}
 				{
 					rightSideCharacters.map((character) => {
 						return (users.filter((user) => user.characterId == character.id).map((user) => (
-							<PlayerCard className={"max-w-1/" + (characters.length + 1).toString()} key={"playerCharacter" + character.id} user={user} character={character} isCurrentUser={false} isPlayerConnected={userData != null} />
+							<PlayerCard
+								className={"max-w-1/" + (characters.length + 1).toString()}
+								key={"playerCharacter" + character.id}
+								user={user} character={character}
+								isCurrentUser={false}
+								isUserDm={userData?.role == "dm"}
+								newInteraction={newInteraction}
+								interactionTargets={interactionTargets}
+								setInteractionTargets={setInteractionTargets}
+							/>
 						)))
 					})
 				}
