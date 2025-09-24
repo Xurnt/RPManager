@@ -2,6 +2,7 @@ import { Character, GameSession } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Dispatch, SetStateAction, useState } from "react";
 import { UpdateStat, UpdateStatView, UpdateType } from "./dm-views/update-stat-view";
+import { RollType, RollView } from "./dm-views/roll-view";
 
 interface DmViewType {
 	gameSession:GameSession,
@@ -16,7 +17,10 @@ export enum MenuType {
 	DamageApplication,
 	Healing,
 	ManaConsumption,
-	ManaRestauration
+	ManaRestauration,
+	StatRoll,
+	MagicRoll,
+	StandardRoll
 }
 
 export function DmView(
@@ -79,11 +83,20 @@ export function DmView(
 							{
 								menuType == MenuType.Main
 								?
-								<div className="flex flex-col justify-around">
-									<Button onClick={() => updateInteraction(MenuType.DamageApplication)} className="text-sm cursor-pointer bg-red-500 text-white-500 hover:bg-red-800  hover:text-white-800">Appliquer dégats</Button>
-									<Button onClick={() => updateInteraction(MenuType.Healing)} className="text-sm cursor-pointer bg-green-500 text-white-500 hover:bg-green-800  hover:text-white-800">Soigner</Button>
-									<Button onClick={() => updateInteraction(MenuType.ManaConsumption)} className="text-sm cursor-pointer bg-purple-500 text-white-500 hover:bg-purple-800  hover:text-white-800">Consommer mana</Button>
-									<Button onClick={() => updateInteraction(MenuType.ManaRestauration)} className="text-sm cursor-pointer bg-blue-500 text-white-500 hover:bg-blue-800  hover:text-white-800">Restaurer Mana</Button>
+								<div className="flex justify-around w-full">
+									<div className="flex flex-col justify-around">
+										<h1 className="text-center">Stats</h1>
+										<Button onClick={() => updateInteraction(MenuType.DamageApplication)} className="text-sm cursor-pointer bg-red-500 text-white-500 hover:bg-red-800  hover:text-white-800">Appliquer dégats</Button>
+										<Button onClick={() => updateInteraction(MenuType.Healing)} className="text-sm cursor-pointer bg-green-500 text-white-500 hover:bg-green-800  hover:text-white-800">Soigner</Button>
+										<Button onClick={() => updateInteraction(MenuType.ManaConsumption)} className="text-sm cursor-pointer bg-purple-500 text-white-500 hover:bg-purple-800  hover:text-white-800">Consommer mana</Button>
+										<Button onClick={() => updateInteraction(MenuType.ManaRestauration)} className="text-sm cursor-pointer bg-blue-500 text-white-500 hover:bg-blue-800  hover:text-white-800">Restaurer Mana</Button>
+									</div>
+									<div className="flex flex-col justify-around">
+										<h1 className="text-center">Jets de dé</h1>
+										<Button onClick={() => updateInteraction(MenuType.StatRoll)} className="text-sm cursor-pointer bg-orange-500 text-white-500 hover:bg-orange-800  hover:text-white-800">Jet de statistique</Button>
+										<Button onClick={() => updateInteraction(MenuType.MagicRoll)} className="text-sm cursor-pointer bg-pink-500 text-white-500 hover:bg-pink-800  hover:text-white-800">Jet de sort</Button>
+										<Button onClick={() => updateInteraction(MenuType.StandardRoll)} className="text-sm cursor-pointer bg-cyan-500 text-white-500 hover:bg-cyan-800  hover:text-white-800">Jet normal</Button>
+									</div>
 								</div>
 								:
 									<div className="flex flex-col w-full">
@@ -136,6 +149,18 @@ export function DmView(
 														updateInteraction={updateInteraction}
 														updateStat={UpdateStat.MANA}
 														updateType={UpdateType.ADD}
+													/>
+												:
+													null
+											}
+											{
+												menuType == MenuType.StatRoll
+												?
+													<RollView
+														rollType={RollType.Stat}
+														removeInteractionTarget={removeInteractionTarget}
+														interactionTargets={interactionTargets}
+														updateInteraction={updateInteraction}
 													/>
 												:
 													null
