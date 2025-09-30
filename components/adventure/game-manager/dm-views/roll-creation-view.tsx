@@ -2,11 +2,14 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Character } from "@prisma/client"
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import { Plus } from 'lucide-react';
 import { Minus } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import { MenuType } from "../dm-view"
+import { socket } from "@/socket";
+import { BonusMalus, BonusMalusOperation, StatName, stats } from "@/data/roll"
+import { DiceRollData } from "@/sockets/dice"
 
 export enum RollType {
 	Stat,
@@ -19,79 +22,38 @@ interface RollViewType {
 	interactionTargets:Character[],
 	removeInteractionTarget: (targetId:number)=> void,
 	updateInteraction:(menu:MenuType, status:boolean) => void,
-}
-interface Stat{
-	name:string
-	pgName:string
+	setRollData:Dispatch<SetStateAction<DiceRollData[]>>
 }
 
-const stats:Stat[] = [
-	{
-		name:"Vitalité",
-		pgName: "currenVitality"
-	},
-	{
-		name:"Mana",
-		pgName: "currenMana"
-	},
-		{
-		name:"Force",
-		pgName: "strength"
-	},
-		{
-		name:"Dextérité",
-		pgName: "dexterity"
-	},
-		{
-		name:"Sang-froid",
-		pgName: "courage"
-	},
-		{
-		name:"Charisme",
-		pgName: "charisma"
-	},
-		{
-		name:"Perception",
-		pgName: "perception"
-	},
-	{
-		name:"Discrétion",
-		pgName: "discretion"
-	},
-	{
-		name:"Savoir",
-		pgName: "knowledge"
-	},
-]
 
-enum BonusMalusOperation {
-	BONUS="+",
-	MALUS="-"
-}
 
 enum BonusMalusListAction {
 	ADD,
 	REMOVE
 }
 
-interface BonusMalus{
-	operation: BonusMalusOperation,
-	value:number,
-	id:number
-}
 
-export function RollView({
+
+export function RollCreationView({
 	rollType,
 	interactionTargets,
 	removeInteractionTarget,
-	updateInteraction
+	updateInteraction,
+	setRollData
 }:RollViewType){
 
-	const [stat, setStat] = useState<string>("")
+	const [stat, setStat] = useState<StatName>()
 	const [bonusMalusValue, setBonusMalusValue] = useState<string>("")
 	const [bonusMalusIndex, setBonusMalusIndex] = useState<number>(1)
 	const [bonusMalusList, setBonusMalusList] = useState<BonusMalus[]>([])
 	const [successScore, setSuccessScore] = useState<string>("")
+
+	socket.on("statDicePlayerView", (data: DiceRollData[]) => {
+		updateInteraction(MenuType.RollView, true)
+		setRollData(data)
+	})
+
+
 
 	const handleBonusMalusChange = (event:React.ChangeEvent<HTMLInputElement>) => {
 		if ((!isNaN(Number(event.target.value))) || event.target.value=="") {
@@ -99,9 +61,10 @@ export function RollView({
 		}
 	}
 
-	const handleStatChange = (value:string) => {
+	const handleStatChange = (value:StatName) => {
 		setStat(value)
 	}
+
 
 	const handleSuccessScore = (event:React.ChangeEvent<HTMLInputElement>) => {
 		if ((!isNaN(Number(event.target.value))) || event.target.value=="") {
@@ -112,6 +75,7 @@ export function RollView({
 		operationValue?:BonusMalusOperation, 
 		id?:number
 	}
+
 
 	const updateBonusMalusList = (action:BonusMalusListAction, option:UpdateBonusMalusListOption) => {
 		var tempBonusMalusList = [...bonusMalusList]
@@ -133,23 +97,36 @@ export function RollView({
 
 
 
-	async function handleSubmit() {
-		const response = await fetch('/api/diceRoll', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(
-				{
-					targets:interactionTargets.map((interactionTarget) => interactionTarget.id),
-					bonusMalusList: bonusMalusList,
-					stat: stat,
-					successScore:successScore
-				}
-			),
-		})
-		if (response.status == 200) {
-			updateInteraction(MenuType.Main, false)
-		}
+	function handleSubmit() {
+		// const response = await fetch('/api/diceRoll', {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify(
+		// 		{
+		// 			targets:interactionTargets.map((interactionTarget) => interactionTarget.id),
+		// 			bonusMalusList: bonusMalusList,
+		// 			stat: stat,
+		// 			successScore:parseInt(successScore)
+		// 		}
+		// 	),
+		// })
+		console.log(socket)
+
+
+		socket.emit(
+			"stat", 
+			{
+				targets:interactionTargets.map((interactionTarget) => interactionTarget.id),
+				bonusMalusList: bonusMalusList,
+				stat: stat,
+				successScore:parseInt(successScore)
+			}
+		)
+		// if (response.status == 200) {
+		// 	updateInteraction(MenuType.Main, false)
+		// }
 	}
+
 
 	return(
 		<div>

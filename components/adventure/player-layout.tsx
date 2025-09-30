@@ -3,6 +3,8 @@ import { PlayerCard } from "./player-card";
 import { UserData } from "../client-layout";
 import { useEffect, useState } from "react";
 import { GameManager } from "./game-manager/game-manager";
+import io, { Socket } from "socket.io-client";
+import { DiceRollData } from "@/sockets/dice";
 
 interface PlayerLayoutProps {
 	users: User[]
@@ -11,6 +13,7 @@ interface PlayerLayoutProps {
 	gameSession:GameSession
 }
 
+let socket:Socket;
 
 export function PlayerLayout({users, characters, userData, gameSession}:PlayerLayoutProps){
 
@@ -28,13 +31,15 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 	const [interactionTargets, setInteractionTargets] = useState<Character[]>([])
 	const [newInteraction, setNewInteraction] = useState<boolean>(false)
 
-
 	useEffect(() => {
 		setCurrentUser(findCurrentUser(users, userData))
+		const connectedUsers = users.filter((user) => user.isConnected)
+		const connectedPlayers = connectedUsers.filter((user) => user.characterId != null)
+		const connectedCharacters = connectedPlayers.map((user) => characters.filter((character) => character.id == user.characterId)[0])
 		if(userData){
 			const currentUserCharacterTemp:Character|null = findCurrentCharacter(characters, userData)
 			setCurrentUserCharacter(currentUserCharacterTemp)
-			const tempCharacters:Character[] = [...characters]
+			const tempCharacters:Character[] = [...connectedCharacters]
 			if(currentUserCharacterTemp){
 				const indexOfCurrentUserCharacterTemp:number = tempCharacters.findIndex((character) => character.id == currentUserCharacterTemp.id) 
 				if (indexOfCurrentUserCharacterTemp!=-1){
@@ -50,18 +55,17 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 				}
 			}
 		} else {
-				const connectedUsers = users.filter((user) => user.isConnected)
-				const connectedPlayers = connectedUsers.filter((user) => user.characterId != null)
-				const connectedCharacters = connectedPlayers.map((user) => characters.filter((character) => character.id == user.characterId)[0])
 				console.log(connectedCharacters)
 				setLeftSideCharacters(connectedCharacters)
 				setRightSideCharacters([])
 			}
 	}, [userData, characters])
 
+
+
 	return(
 		<div  className="flex flex-1 flex-col justify-around items-center gap-5">
-			<div className="p-5 w-full h-1/2">
+			<div className="p-5 w-full h-2/3">
 				{gameSession
 					?
 						<GameManager
@@ -71,18 +75,18 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 							interactionTargets={interactionTargets}
 							newInteraction={newInteraction}
 							setInteractionTargets={setInteractionTargets}
+							characters={characters}
 						/>
 					:
 						null
 				}
 				
 			</div>
-			<div className="flex items-end justify-around gap-4 h-1/2">
+			<div className="flex items-end justify-around gap-4 h-1/3 w-full">
 				{
 					leftSideCharacters.map((character) => {
 						return (users.filter((user) => user.characterId == character.id).map((user) => (
 							<PlayerCard
-								className={"max-w-1/" + (characters.length + 1).toString()}
 								key={"playerCharacter" + character.id}
 								user={user}
 								character={character}
@@ -98,7 +102,6 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 				{ currentUser
 					? currentUserCharacter
 						?	<PlayerCard
-							className={"max-w-2/" + (characters.length + 1).toString()}
 							user={currentUser}
 							character={currentUserCharacter}
 							isCurrentUser={true}
@@ -114,7 +117,6 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 					rightSideCharacters.map((character) => {
 						return (users.filter((user) => user.characterId == character.id).map((user) => (
 							<PlayerCard
-								className={"max-w-1/" + (characters.length + 1).toString()}
 								key={"playerCharacter" + character.id}
 								user={user} character={character}
 								isCurrentUser={false}

@@ -5,10 +5,9 @@ import {
 	StatName,
 	UpdateType,
 } from "@/components/adventure/game-manager/dm-views/update-stat-view";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/server/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const prisma = new PrismaClient();
 interface StatBodyUpdateRequest extends NextApiRequest {
 	body: {
 		value: number;
@@ -18,6 +17,7 @@ interface StatBodyUpdateRequest extends NextApiRequest {
 		stat: StatName;
 	};
 }
+
 export default async function handler(
 	req: StatBodyUpdateRequest,
 	res: NextApiResponse

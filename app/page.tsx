@@ -1,8 +1,6 @@
 "use server"
 import ClientProviders from "@/components/client-providers";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/server/prisma";
 
 export default async function Home() {
 
@@ -16,7 +14,6 @@ export default async function Home() {
 		},
 	});
 	const gameSession = await prisma.gameSession.findFirst()
-	console.log(characters)
   return (
 		<ClientProviders gameSession={gameSession} users={users} characters={characters} classCategories={classCategories} classes={classes} />
   );

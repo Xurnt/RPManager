@@ -11,7 +11,6 @@ import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { LoginForm } from "./login-form";
 import { useCookies } from 'react-cookie';
-import { DmLayout } from "./adventure/dm-layout";
 import { PlayerLayout } from "./adventure/player-layout";
 
 export interface ClientLayoutProps {
@@ -41,6 +40,7 @@ export function ClientLayout(
 	const [loginDialogOpen, setLoginDialogOpen] = useState<boolean>(false)
 	const [userData, setUserData] = useState<UserData|null>(null)
 	const [cookie,setCookie, removeCookie] = useCookies(['jwt'])
+
   useEffect(() => {
 		if (cookie.jwt) {
 			fetch('/api/jwt')
@@ -62,6 +62,7 @@ export function ClientLayout(
 				setUserData(null)
 			}
   }, [cookie])
+
 	console.log(gameSession)
 	 async function disconnect () {
 		if(userData){

@@ -1,9 +1,8 @@
 "use server";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
-const prisma = new PrismaClient();
+import { prisma } from "@/server/prisma";
 
 export default async function handler(
 	req: NextApiRequest,

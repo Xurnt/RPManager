@@ -4,6 +4,8 @@ import { Card } from "../../ui/card";
 import { Dispatch, SetStateAction, useState } from "react";
 import { DmView } from "./dm-view";
 import { PlayerView } from "./player-view";
+import { Socket } from "socket.io-client";
+import { DiceRollData } from "@/sockets/dice";
 
 interface GameManagerType {
 	userData:UserData|null
@@ -11,7 +13,8 @@ interface GameManagerType {
 	setNewInteraction: Dispatch<SetStateAction<boolean>>,
 	interactionTargets:Character[],
 	newInteraction:boolean,
-	setInteractionTargets:Dispatch<SetStateAction<Character[]>>
+	setInteractionTargets:Dispatch<SetStateAction<Character[]>>,
+	characters:Character[]
 }
 
 export function GameManager(
@@ -21,8 +24,10 @@ export function GameManager(
 		setNewInteraction,
 		interactionTargets,
 		newInteraction,
-		setInteractionTargets
+		setInteractionTargets,
+		characters
 	}:GameManagerType){
+	const [rollData, setRollData] = useState<DiceRollData[]>([])
 
 	return(
 		<Card className="block w-full h-full p-5">
@@ -42,9 +47,19 @@ export function GameManager(
 							interactionTargets={interactionTargets}
 							newInteraction={newInteraction}
 							setInteractionTargets={setInteractionTargets}
+							rollData={rollData}
+							setRollData={setRollData}
+							userData={userData}
 						/>
 					:
-						<PlayerView />
+						<PlayerView
+							rollData={rollData}
+							setRollData={setRollData}
+							userData={userData}
+							interactionTargets={interactionTargets}
+							setInteractionTargets={setInteractionTargets}
+							characters={characters}
+						/>
 			}
 		</Card>
 	)

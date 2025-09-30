@@ -2,7 +2,10 @@ import { Character, GameSession } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Dispatch, SetStateAction, useState } from "react";
 import { UpdateStat, UpdateStatView, UpdateType } from "./dm-views/update-stat-view";
-import { RollType, RollView } from "./dm-views/roll-view";
+import { RollType, RollCreationView } from "./dm-views/roll-creation-view";
+import { RollView } from "./roll-view";
+import { DiceRollData } from "@/sockets/dice";
+import { UserData } from "@/components/client-layout";
 
 interface DmViewType {
 	gameSession:GameSession,
@@ -10,6 +13,9 @@ interface DmViewType {
 	interactionTargets:Character[],
 	newInteraction:boolean,
 	setInteractionTargets:Dispatch<SetStateAction<Character[]>>
+	rollData:DiceRollData[],
+	setRollData:Dispatch<SetStateAction<DiceRollData[]>>,
+	userData:UserData
 }
 
 export enum MenuType {
@@ -20,7 +26,8 @@ export enum MenuType {
 	ManaRestauration,
 	StatRoll,
 	MagicRoll,
-	StandardRoll
+	StandardRoll,
+	RollView
 }
 
 export function DmView(
@@ -29,7 +36,11 @@ export function DmView(
 		setNewInteraction,
 		newInteraction,
 		interactionTargets,
-		setInteractionTargets
+		setInteractionTargets,
+		rollData,
+		setRollData,
+		userData
+		
 	}:DmViewType){
 
 	const [gameActive, setGameActive] = useState<boolean>(gameSession.isActive)
@@ -156,11 +167,23 @@ export function DmView(
 											{
 												menuType == MenuType.StatRoll
 												?
-													<RollView
+													<RollCreationView
 														rollType={RollType.Stat}
 														removeInteractionTarget={removeInteractionTarget}
 														interactionTargets={interactionTargets}
 														updateInteraction={updateInteraction}
+														setRollData={setRollData}
+													/>
+												:
+													null
+											}
+											{
+												menuType == MenuType.RollView
+												?
+													<RollView 
+														diceRollData={rollData}
+														userData={userData}
+														interactionTargets={interactionTargets}
 													/>
 												:
 													null
