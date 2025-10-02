@@ -40,6 +40,7 @@ model Character {
   picturePath                          String
   currentVitality                      Int
   currentMana                          Int
+  corruption                           Int    @default(0)
   Class_Character_mainClassIdToClass   Class  @relation("Character_mainClassIdToClass", fields: [mainClassId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Character_classId_fkey")
   Class_Character_secondClassIdToClass Class? @relation("Character_secondClassIdToClass", fields: [secondClassId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   User                                 User[]

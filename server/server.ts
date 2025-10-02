@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import { setupDiceHandlers } from "../sockets/dice.ts";
 import next from "next";
+import { setupInteractionHandlers } from "../sockets/interaction.ts";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "0.0.0.0";
@@ -16,7 +17,7 @@ app.prepare().then(() => {
 
 	socketServer = new Server(httpServer);
 	setupDiceHandlers(socketServer);
-
+	setupInteractionHandlers(socketServer);
 	httpServer
 		.once("error", (err) => {
 			console.error(err);

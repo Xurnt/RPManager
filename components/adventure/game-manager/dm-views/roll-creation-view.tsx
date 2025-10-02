@@ -8,14 +8,8 @@ import { Minus } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import { MenuType } from "../dm-view"
 import { socket } from "@/socket";
-import { BonusMalus, BonusMalusOperation, StatName, stats } from "@/data/roll"
-import { DiceRollData } from "@/sockets/dice"
-
-export enum RollType {
-	Stat,
-	Magic,
-	Standard
-}
+import { BonusMalus, BonusMalusOperation, RollType, StatName, stats } from "@/data/roll"
+import { DiceRollData, DiceRollRequest } from "@/sockets/dice"
 
 interface RollViewType {
 	rollType:RollType
@@ -31,8 +25,6 @@ enum BonusMalusListAction {
 	ADD,
 	REMOVE
 }
-
-
 
 export function RollCreationView({
 	rollType,
@@ -98,33 +90,18 @@ export function RollCreationView({
 
 
 	function handleSubmit() {
-		// const response = await fetch('/api/diceRoll', {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify(
-		// 		{
-		// 			targets:interactionTargets.map((interactionTarget) => interactionTarget.id),
-		// 			bonusMalusList: bonusMalusList,
-		// 			stat: stat,
-		// 			successScore:parseInt(successScore)
-		// 		}
-		// 	),
-		// })
-		console.log(socket)
-
-
-		socket.emit(
-			"stat", 
-			{
+		if (interactionTargets.length>0 && successScore != "") {
+			var rollCreationData:DiceRollRequest = {
 				targets:interactionTargets.map((interactionTarget) => interactionTarget.id),
 				bonusMalusList: bonusMalusList,
-				stat: stat,
-				successScore:parseInt(successScore)
+				successScore:parseInt(successScore),
+				type:rollType
 			}
-		)
-		// if (response.status == 200) {
-		// 	updateInteraction(MenuType.Main, false)
-		// }
+			if (stat) {
+				rollCreationData.stat = stat	
+			}
+			socket.emit("createRoll", rollCreationData)
+		}
 	}
 
 

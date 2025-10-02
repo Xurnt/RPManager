@@ -1,6 +1,6 @@
 import { UserData } from "@/components/client-layout";
 import { DiceRollData } from "@/sockets/dice";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SingleRoll } from "./single-roll";
 import { Character } from "@prisma/client";
 
@@ -31,14 +31,15 @@ export function RollView({
 		// },[diceRollData,userData])
 
 	return(
-	<div className="flex flex-1 flex-col">
+	<div className="flex flex-1 flex-wrap justify-between max-h-1">
 			{diceRollData.map((diceRollDataItem => (
-				<div key={"singleRollTarget" + diceRollDataItem.target}>
+				<div className="basis-1/2 p-2" key={"singleRollTarget" + diceRollDataItem.target}>
 					<SingleRoll
 						key={"SingleRoll" + diceRollDataItem.target}
 						diceRollData={diceRollDataItem}
 						interactionTargets={interactionTargets}
 						canInteract={diceRollDataItem.target == userData.characterId}
+						userData={userData}
 					/>
 				</div>
 			)))}

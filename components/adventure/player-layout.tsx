@@ -5,6 +5,13 @@ import { useEffect, useState } from "react";
 import { GameManager } from "./game-manager/game-manager";
 import io, { Socket } from "socket.io-client";
 import { DiceRollData } from "@/sockets/dice";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 interface PlayerLayoutProps {
 	users: User[]
@@ -24,48 +31,34 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 	(characters, userData) => userData ? characters.filter((character) => character.id == userData.characterId)[0] : null
 
 
-	const [currentUser, setCurrentUser] = useState<User|null>(findCurrentUser(users, userData))
-	const [currentUserCharacter, setCurrentUserCharacter] = useState<Character|null>(findCurrentCharacter(characters, userData))
-	const [leftSideCharacters, setLeftSideCharacters] = useState<Character[]>([])
-	const [rightSideCharacters, setRightSideCharacters] = useState<Character[]>([])
 	const [interactionTargets, setInteractionTargets] = useState<Character[]>([])
+	const [orderedCharacters, setOrderedCharacters] = useState<Character[]>(characters)
 	const [newInteraction, setNewInteraction] = useState<boolean>(false)
 
 	useEffect(() => {
-		setCurrentUser(findCurrentUser(users, userData))
-		const connectedUsers = users.filter((user) => user.isConnected)
-		const connectedPlayers = connectedUsers.filter((user) => user.characterId != null)
-		const connectedCharacters = connectedPlayers.map((user) => characters.filter((character) => character.id == user.characterId)[0])
-		if(userData){
-			const currentUserCharacterTemp:Character|null = findCurrentCharacter(characters, userData)
-			setCurrentUserCharacter(currentUserCharacterTemp)
-			const tempCharacters:Character[] = [...connectedCharacters]
-			if(currentUserCharacterTemp){
-				const indexOfCurrentUserCharacterTemp:number = tempCharacters.findIndex((character) => character.id == currentUserCharacterTemp.id) 
-				if (indexOfCurrentUserCharacterTemp!=-1){
-					tempCharacters.splice(indexOfCurrentUserCharacterTemp, 1)
-					var leftSideCharactersTemp:Character[]=[]
-					if (tempCharacters.length % 2 == 0) {
-						leftSideCharactersTemp= tempCharacters.splice(1, tempCharacters.length / 2)
-					} else {
-						leftSideCharactersTemp= tempCharacters.splice(1, (tempCharacters.length + 1) / 2)
-					}
-					setLeftSideCharacters(leftSideCharactersTemp)
-					setRightSideCharacters(tempCharacters)
-				}
+		var tempCharacters:Character[] = [...characters]
+		if (userData) {
+			const currentCharacterIndex:number = tempCharacters.findIndex((character) => character.id == userData.characterId)
+			if (currentCharacterIndex!=-1) {
+				const currentCharacter = tempCharacters[currentCharacterIndex]
+				tempCharacters.splice(currentCharacterIndex, 1)
+				tempCharacters.splice(1,0,currentCharacter)
+				// const arrayBeforeCharacter = tempCharacters.splice(0, currentCharacterIndex)
+				// const arrayWithOnlyCharacter = tempCharacters.splice(0, 1)
+				// const arrayAfterCharacter = tempCharacters
+				// var newOrderedArray = []
+				// if (arrayBeforeCharacter.length>0) {
+				// 	newOrderedArray = arrayBeforeCharacter.splice(0,1)
+				// 	newOrderedArray+=
+				// }
+				setOrderedCharacters(tempCharacters)
 			}
-		} else {
-				console.log(connectedCharacters)
-				setLeftSideCharacters(connectedCharacters)
-				setRightSideCharacters([])
-			}
+		}
 	}, [userData, characters])
 
-
-
 	return(
-		<div  className="flex flex-1 flex-col justify-around items-center gap-5">
-			<div className="p-5 w-full h-2/3">
+		<div  className="flex flex-2 flex-col justify-around items-center gap-5">
+			<div className="p-5 w-full h-3/4">
 				{gameSession
 					?
 						<GameManager
@@ -80,54 +73,40 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 					:
 						null
 				}
-				
 			</div>
-			<div className="flex items-end justify-around gap-4 h-1/3 w-full">
-				{
-					leftSideCharacters.map((character) => {
-						return (users.filter((user) => user.characterId == character.id).map((user) => (
-							<PlayerCard
-								key={"playerCharacter" + character.id}
-								user={user}
-								character={character}
-								isCurrentUser={false}
-								isUserDm={userData?.role == "dm"}
-								interactionTargets={interactionTargets}
-								newInteraction={newInteraction}
-								setInteractionTargets={setInteractionTargets}
-							/>
-						)))
-					})
-				}
-				{ currentUser
-					? currentUserCharacter
-						?	<PlayerCard
-							user={currentUser}
-							character={currentUserCharacter}
-							isCurrentUser={true}
-							isUserDm={userData?.role == "dm"}
-							interactionTargets={interactionTargets}
-							newInteraction={newInteraction}
-							setInteractionTargets={setInteractionTargets}
-						/>
-						:null
-					:null
-				}
-				{
-					rightSideCharacters.map((character) => {
-						return (users.filter((user) => user.characterId == character.id).map((user) => (
-							<PlayerCard
-								key={"playerCharacter" + character.id}
-								user={user} character={character}
-								isCurrentUser={false}
-								isUserDm={userData?.role == "dm"}
-								newInteraction={newInteraction}
-								interactionTargets={interactionTargets}
-								setInteractionTargets={setInteractionTargets}
-							/>
-						)))
-					})
-				}
+			<div className="flex items-stretch justify-around gap-4 items-stretch h-1/4 w-full px-5">
+				<Carousel
+					className="flex-2"
+					opts={
+						{
+							loop:true,
+							
+						}
+					}
+				>
+					<CarouselPrevious className="cursor-pointer" />
+					<CarouselContent className="flex justify-between h-full">
+						{
+							orderedCharacters.map((character) => {
+								return (users.filter((user) => user.characterId == character.id).map((user) => (
+									<CarouselItem key={"characterCarouselItem" + user.characterId} className="basis-1/5">
+										<PlayerCard
+											key={"playerCharacter" + character.id}
+											user={user}
+											character={character}
+											isCurrentUser={user.id==userData?.userId}
+											isUserDm={userData?.role == "dm"}
+											interactionTargets={interactionTargets}
+											newInteraction={newInteraction}
+											setInteractionTargets={setInteractionTargets}
+										/>
+									</CarouselItem>
+								)))
+							})
+						}
+					</CarouselContent>
+					<CarouselNext className="cursor-pointer" />
+				</Carousel>
 			</div>
 		</div>
 	)

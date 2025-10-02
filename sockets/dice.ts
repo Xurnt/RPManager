@@ -1,22 +1,31 @@
 import { prisma } from "../server/prisma";
-import { BonusMalus, BonusMalusOperation, StatName } from "../data/roll.ts";
+import {
+	BonusMalus,
+	BonusMalusOperation,
+	RollType,
+	StatName,
+} from "../data/roll.ts";
 import { Server, Socket } from "socket.io";
 import { DiceState } from "@/components/adventure/game-manager/dice.tsx";
 
-interface DiceRollRequest {
+export interface DiceRollRequest {
 	bonusMalusList: BonusMalus[];
-	stat: StatName;
+	stat?: StatName;
 	successScore: number;
 	targets: number[];
+	type: RollType;
 }
 
 export interface DiceRollData {
+	id: number;
 	successScore: number;
 	bonusMalusValue: number;
 	target: number;
 	statDiceValue?: number;
 	statName?: StatName;
+	maxManaUsage?: number;
 	diceIds: number[];
+	type: RollType;
 }
 
 export interface UpdateDiceStateRequest {
@@ -24,16 +33,23 @@ export interface UpdateDiceStateRequest {
 	value?: number;
 	state: DiceState;
 }
+
+export interface SetManaUsageRequest {
+	id: number;
+	characterId: number;
+	mana: string;
+}
+
 var diceId = 0;
+var diceRollId = 0;
 
 export function setupDiceHandlers(io: Server) {
 	io.on("connection", (socket: Socket) => {
 		console.log("New /dice connection:", socket.id);
 
-		socket.on("stat", async (rollRequest: DiceRollRequest) => {
-			console.log("NEW DICE MESSAGE");
+		socket.on("createRoll", async (rollRequest: DiceRollRequest) => {
 			console.log(rollRequest);
-			const { bonusMalusList, stat, successScore, targets } = rollRequest;
+			const { bonusMalusList, stat, successScore, targets, type } = rollRequest;
 			var responseData: DiceRollData[] = [];
 			for (let targetId of targets) {
 				const targetCharacter = await prisma.character.findUnique({
@@ -56,18 +72,35 @@ export function setupDiceHandlers(io: Server) {
 						}
 					}
 					var diceIds = [];
-					for (let i = 0; i < 2; i++) {
+					var diceNumber = 1;
+					if (type == RollType.Stat) {
+						diceNumber++;
+					}
+					if (bonusMalusList.length > 0) {
+						diceNumber++;
+					}
+					for (let i = 0; i < diceNumber; i++) {
 						diceIds.push(diceId);
 						diceId++;
 					}
-					responseData.push({
-						statDiceValue: targetCharacter[stat],
+
+					var responseDataBody: DiceRollData = {
 						target: targetId,
 						bonusMalusValue: bonusMalusValue,
 						successScore: successScore,
 						statName: stat,
 						diceIds: diceIds,
-					});
+						type: type,
+						id: diceRollId,
+					};
+					if (stat) {
+						responseDataBody.statDiceValue = targetCharacter[stat];
+					}
+					if (type == RollType.Magic) {
+						responseDataBody.maxManaUsage = targetCharacter.currentMana;
+					}
+					responseData.push(responseDataBody);
+					diceRollId++;
 				}
 				io.sockets.emit("statDicePlayerView", responseData);
 			}
@@ -77,6 +110,30 @@ export function setupDiceHandlers(io: Server) {
 			"updateDiceStateServer",
 			(updateStateRequest: UpdateDiceStateRequest) => {
 				io.sockets.emit("updateDiceStateClient", updateStateRequest);
+			}
+		);
+
+		socket.on(
+			"setManaUsageServer",
+			async (updateStateRequest: SetManaUsageRequest) => {
+				const targetCharacter = await prisma.character.findUnique({
+					where: {
+						id: updateStateRequest.characterId,
+					},
+				});
+				if (targetCharacter) {
+					const currentManaPreviousValue = targetCharacter.currentMana;
+					await prisma.character.update({
+						where: {
+							id: targetCharacter.id,
+						},
+						data: {
+							currentMana:
+								currentManaPreviousValue - parseInt(updateStateRequest.mana),
+						},
+					});
+					io.sockets.emit("setManaUsageClient", updateStateRequest);
+				}
 			}
 		);
 

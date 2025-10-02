@@ -8,8 +8,9 @@ interface DiceProps{
 	totalRollValue:number
 	setTotalRollValue:Dispatch<SetStateAction<number>>
 	canInteract:boolean
-	diceRollData:DiceRollData,
 	id:number
+	setActiveDiceNumber:Dispatch<SetStateAction<number>>
+	activeDiceNumber:number
 }
 
 export enum DiceState {
@@ -30,8 +31,9 @@ export function Dice({
 		totalRollValue,
 		setTotalRollValue,
 		canInteract,
-		diceRollData,
-		id
+		id,
+		activeDiceNumber,
+		setActiveDiceNumber
 	}:DiceProps){
 		const [value, setValue] = useState<number>(maxValue)
 		const [diceState, setDiceState] = useState<DiceState>(DiceState.TO_ROLL)
@@ -65,8 +67,10 @@ export function Dice({
 		if (id == data.id) {
 			setDiceState(data.state)
 			if (data.value) {
+				console.log("Update with value :" + data.value)
 				setValue(data.value)
 				setTotalRollValue(totalRollValue + data.value)
+				setActiveDiceNumber(activeDiceNumber - 1)
 			}
 		}
 	})

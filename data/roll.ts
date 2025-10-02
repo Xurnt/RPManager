@@ -10,6 +10,12 @@ export enum StatName {
 	KNOWLEDGE = "knowledge",
 }
 
+export enum RollType {
+	Stat,
+	Magic,
+	Standard,
+}
+
 export enum BonusMalusOperation {
 	BONUS = "+",
 	MALUS = "-",

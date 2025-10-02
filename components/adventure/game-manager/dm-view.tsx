@@ -2,10 +2,12 @@ import { Character, GameSession } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Dispatch, SetStateAction, useState } from "react";
 import { UpdateStat, UpdateStatView, UpdateType } from "./dm-views/update-stat-view";
-import { RollType, RollCreationView } from "./dm-views/roll-creation-view";
+import { RollCreationView } from "./dm-views/roll-creation-view";
 import { RollView } from "./roll-view";
 import { DiceRollData } from "@/sockets/dice";
 import { UserData } from "@/components/client-layout";
+import { socket } from "@/socket";
+import { RollType } from "@/data/roll";
 
 interface DmViewType {
 	gameSession:GameSession,
@@ -24,9 +26,7 @@ export enum MenuType {
 	Healing,
 	ManaConsumption,
 	ManaRestauration,
-	StatRoll,
-	MagicRoll,
-	StandardRoll,
+	RollCreation,
 	RollView
 }
 
@@ -45,6 +45,7 @@ export function DmView(
 
 	const [gameActive, setGameActive] = useState<boolean>(gameSession.isActive)
 	const [menuType, setMenuType] = useState<MenuType>(MenuType.Main)
+	const [rollMenuType, setRollMenuType] = useState<RollType>(RollType.Standard)
 
 	async function toggleGameSession (status:boolean) {
 		const response = await fetch('/api/gameSessionUpdate', {
@@ -62,12 +63,18 @@ export function DmView(
 		setNewInteraction(status)
 		if (!status) {
 			setInteractionTargets([])
+			socket.emit("stopInteraction")
 		}
 	}
 	const removeInteractionTarget = (targetId:number) => {
 		var tempInteractionTargets= [...interactionTargets]
 		tempInteractionTargets.splice(interactionTargets.findIndex((interactionTarget) => interactionTarget.id == targetId), 1)
 		setInteractionTargets(tempInteractionTargets)
+	}
+
+	const openRollMenu = (rollType:RollType) => {
+		setRollMenuType(rollType)
+		updateInteraction(MenuType.RollCreation)
 	}
 
 	return(
@@ -104,9 +111,9 @@ export function DmView(
 									</div>
 									<div className="flex flex-col justify-around">
 										<h1 className="text-center">Jets de dé</h1>
-										<Button onClick={() => updateInteraction(MenuType.StatRoll)} className="text-sm cursor-pointer bg-orange-500 text-white-500 hover:bg-orange-800  hover:text-white-800">Jet de statistique</Button>
-										<Button onClick={() => updateInteraction(MenuType.MagicRoll)} className="text-sm cursor-pointer bg-pink-500 text-white-500 hover:bg-pink-800  hover:text-white-800">Jet de sort</Button>
-										<Button onClick={() => updateInteraction(MenuType.StandardRoll)} className="text-sm cursor-pointer bg-cyan-500 text-white-500 hover:bg-cyan-800  hover:text-white-800">Jet normal</Button>
+										<Button onClick={() => openRollMenu(RollType.Stat)} className="text-sm cursor-pointer bg-orange-500 text-white-500 hover:bg-orange-800  hover:text-white-800">Jet de statistique</Button>
+										<Button onClick={() => openRollMenu(RollType.Magic)} className="text-sm cursor-pointer bg-pink-500 text-white-500 hover:bg-pink-800  hover:text-white-800">Jet de sort</Button>
+										<Button onClick={() => openRollMenu(RollType.Standard)} className="text-sm cursor-pointer bg-cyan-500 text-white-500 hover:bg-cyan-800  hover:text-white-800">Jet normal</Button>
 									</div>
 								</div>
 								:
@@ -165,10 +172,10 @@ export function DmView(
 													null
 											}
 											{
-												menuType == MenuType.StatRoll
+												menuType == MenuType.RollCreation
 												?
 													<RollCreationView
-														rollType={RollType.Stat}
+														rollType={rollMenuType}
 														removeInteractionTarget={removeInteractionTarget}
 														interactionTargets={interactionTargets}
 														updateInteraction={updateInteraction}

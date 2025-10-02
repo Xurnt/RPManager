@@ -13,6 +13,10 @@ interface PlayerViewProps {
 	setInteractionTargets:Dispatch<SetStateAction<Character[]>>,
 	characters:Character[]
 }
+export enum PlayerViews {
+	Main,
+	Roll
+}
 
 export function PlayerView({
 	rollData,
@@ -24,18 +28,22 @@ export function PlayerView({
 
 }:PlayerViewProps){
 
-	const [diceViewVisible, setDiceViewVisible] = useState<boolean>(false)
+	const [playerView, setPlayerView] = useState<PlayerViews>(PlayerViews.Main)
 
 	socket.on("statDicePlayerView", (data: DiceRollData[]) => {
 		setRollData(data)
-		setDiceViewVisible(true)
+		setPlayerView(PlayerViews.Roll)
 		setInteractionTargets(characters.filter((character) => data.map((dataItem) => dataItem.target).includes(character.id)))
+	})
+
+	socket.on("stopInteraction", () => {
+		setPlayerView(PlayerViews.Main)
 	})
 
 	return(
 		<div className="flex flex-1 h-full">
 			{
-				diceViewVisible
+				playerView == PlayerViews.Roll
 				?
 					<RollView
 					 diceRollData={rollData}
