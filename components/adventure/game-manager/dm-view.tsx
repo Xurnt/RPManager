@@ -1,13 +1,14 @@
 import { Character, GameSession } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Dispatch, SetStateAction, useState } from "react";
-import { UpdateStat, UpdateStatView, UpdateType } from "./dm-views/update-stat-view";
 import { RollCreationView } from "./dm-views/roll-creation-view";
 import { RollView } from "./roll-view";
 import { DiceRollData } from "@/sockets/dice";
 import { UserData } from "@/components/client-layout";
 import { socket } from "@/socket";
 import { RollType } from "@/data/roll";
+import { UpdateStat, UpdateType } from "@/data/stats";
+import { UpdateStatView } from "./dm-views/update-stat-view"
 
 interface DmViewType {
 	gameSession:GameSession,

@@ -12,6 +12,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { socket } from "@/socket";
 
 interface PlayerLayoutProps {
 	users: User[]
@@ -20,41 +21,38 @@ interface PlayerLayoutProps {
 	gameSession:GameSession
 }
 
-let socket:Socket;
-
 export function PlayerLayout({users, characters, userData, gameSession}:PlayerLayoutProps){
 
-	const findCurrentUser: (users:User[], userData:UserData|null) => User|null =
-	(users, userData) => userData ? users.filter((user) => user.id == userData.userId)[0] : null
-
-	const findCurrentCharacter: (characters:Character[], userData:UserData|null) => Character|null =
-	(characters, userData) => userData ? characters.filter((character) => character.id == userData.characterId)[0] : null
-
-
+	const [charactersState, setCharactersState] = useState<Character[]>(characters)
 	const [interactionTargets, setInteractionTargets] = useState<Character[]>([])
 	const [orderedCharacters, setOrderedCharacters] = useState<Character[]>(characters)
 	const [newInteraction, setNewInteraction] = useState<boolean>(false)
 
+
+	socket.on("getCharactersClient", (data:Character[]) => {
+		console.log("cccccccccccccccc")
+		if (data.length>0) {
+			setCharactersState(data)
+		}
+	})
+
+	socket.on("updateStatsClient", () => {
+		socket.emit("getCharactersServer")
+	})
+
 	useEffect(() => {
-		var tempCharacters:Character[] = [...characters]
+		var tempCharacters:Character[] = [...charactersState]
+		console.log("dddddddddddd")
 		if (userData) {
 			const currentCharacterIndex:number = tempCharacters.findIndex((character) => character.id == userData.characterId)
 			if (currentCharacterIndex!=-1) {
 				const currentCharacter = tempCharacters[currentCharacterIndex]
 				tempCharacters.splice(currentCharacterIndex, 1)
 				tempCharacters.splice(1,0,currentCharacter)
-				// const arrayBeforeCharacter = tempCharacters.splice(0, currentCharacterIndex)
-				// const arrayWithOnlyCharacter = tempCharacters.splice(0, 1)
-				// const arrayAfterCharacter = tempCharacters
-				// var newOrderedArray = []
-				// if (arrayBeforeCharacter.length>0) {
-				// 	newOrderedArray = arrayBeforeCharacter.splice(0,1)
-				// 	newOrderedArray+=
-				// }
-				setOrderedCharacters(tempCharacters)
 			}
+			setOrderedCharacters(tempCharacters)
 		}
-	}, [userData, characters])
+	}, [userData, charactersState])
 
 	return(
 		<div  className="flex flex-2 flex-col justify-around items-center gap-5">

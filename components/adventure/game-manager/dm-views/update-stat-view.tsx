@@ -1,9 +1,13 @@
+"use client"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Character } from "@prisma/client"
 import { useState } from "react"
 import { MenuType } from "../dm-view"
+import { socket } from "@/socket"
+import { CurrentStatName, StatName, UpdateStat, UpdateType } from "@/data/stats"
 
 interface AddDamageType {
 	interactionTargets:Character[],
@@ -22,26 +26,6 @@ interface UpdateStatType {
 interface UpdateStatsType{
 	updateStat:UpdateStatType
 	updateType:string
-}
-
-export enum UpdateType{
-	ADD=0,
-	REMOVE=1
-}
-
-export enum UpdateStat{
-	VITALITY=0,
-	MANA=1
-}
-
-export enum CurrentStatName {
-	VITALITY="currentVitality",
-	MANA="currentMana"
-}
-
-export enum StatName {
-	VITALITY="vitality",
-	MANA="mana"
 }
 
 const updateStatsType:UpdateStatsType[][] = [
@@ -107,23 +91,23 @@ export function UpdateStatView(
 	}
 
 	async function handleSubmit() {
-		const response = await fetch('/api/updateStat', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(
-				{
-					value:parseInt(updateValue),
-					targets:interactionTargets.map((interactionTarget) => interactionTarget.id),
-					currentStat: currentUpdateStatsType.updateStat.currentStat,
-					type: updateType,
-					stat: currentUpdateStatsType.updateStat.stat,
-				}
-			),
-		})
-		if (response.status == 200) {
-			updateInteraction(MenuType.Main, false)
-		}
+		socket.emit(
+			"updateStatsServer",
+			{
+				value:parseInt(updateValue),
+				targets:interactionTargets.map((interactionTarget) => interactionTarget.id),
+				currentStat: currentUpdateStatsType.updateStat.currentStat,
+				type: updateType,
+				stat: currentUpdateStatsType.updateStat.stat,
+			}
+		)
+
 	}
+
+	socket.on("updateStatsClient", () => {
+		updateInteraction(MenuType.Main, false)
+	})
+	
 
 	return(
 		<>

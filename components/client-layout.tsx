@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { LoginForm } from "./login-form";
 import { useCookies } from 'react-cookie';
 import { PlayerLayout } from "./adventure/player-layout";
+import { ClipLoader } from "react-spinners";
 
 export interface ClientLayoutProps {
 	characters:Character[],
@@ -40,9 +41,11 @@ export function ClientLayout(
 	const [loginDialogOpen, setLoginDialogOpen] = useState<boolean>(false)
 	const [userData, setUserData] = useState<UserData|null>(null)
 	const [cookie,setCookie, removeCookie] = useCookies(['jwt'])
+	const [isFetching, setIsFetching] = useState<boolean>(true)
 
   useEffect(() => {
 		if (cookie.jwt) {
+			setIsFetching(true)
 			fetch('/api/jwt')
 				.then((res) => res.json())
 				.then((data) => {
@@ -53,6 +56,7 @@ export function ClientLayout(
 							role:users.filter((user) => user.id == data.userId)[0].UserRole.role
 						}
 						setUserData(userData)
+						setIsFetching(false)
 					}
 					else {
 						setUserData(null)
@@ -60,6 +64,7 @@ export function ClientLayout(
 				})
 			} else if (userData){
 				setUserData(null)
+				setIsFetching(false)
 			}
   }, [cookie])
 
@@ -106,7 +111,19 @@ export function ClientLayout(
 					<div className="flex flex-1 flex-col gap-4 p-14 pt-0">
 						{dataPage.page == Pages.Home?
 							gameSession?
-								<PlayerLayout gameSession={gameSession} users={users} characters={characters} userData={userData} />
+								isFetching
+								?
+								<div className="flex justify-center items-center h-full">
+							      <ClipLoader
+												color={"#ffffff"}
+												loading={isFetching}
+												size={150}
+												aria-label="Loading Spinner"
+												data-testid="loader"
+											/>
+								</div>
+								:
+									<PlayerLayout gameSession={gameSession} users={users} characters={characters} userData={userData} />
 								:null
 							:null
 						}

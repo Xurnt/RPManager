@@ -1,10 +1,6 @@
 "use server";
 
-import {
-	CurrentStatName,
-	StatName,
-	UpdateType,
-} from "@/components/adventure/game-manager/dm-views/update-stat-view";
+import { CurrentStatName, StatName, UpdateType } from "@/data/stats";
 import { prisma } from "@/server/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 

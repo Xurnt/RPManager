@@ -2,7 +2,7 @@ import { DiceRollData, SetManaUsageRequest, UpdateDiceStateRequest } from "@/soc
 import { Dice } from "./dice";
 import { RollType, stats } from "@/data/roll";
 import { Card } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Character } from "@/generated/prisma";
 import { toast } from "sonner"
 import { motion } from "motion/react"
@@ -52,10 +52,12 @@ export function SingleRoll({
 		}
 
 		socket.on("setManaUsageClient", (data:SetManaUsageRequest) => {
+			console.log("aaaaaaaaaaaaaaaaa")
 			if (data.id==diceRollData.id) {
+			console.log("bbbbbbbbbbbbbbb")
 				setManaUsage(data.mana)
 				setTotalRollValue(totalRollValue + parseInt(data.mana))
-
+				socket.emit("getCharactersServer")
 			}
 		})
 
