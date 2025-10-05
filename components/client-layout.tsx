@@ -102,6 +102,7 @@ export function ClientLayout(
 	
 	socket.on("selectCharacterClient", () => {
 		socket.emit("getUsersServer")
+		socket.emit("getCharactersServer")
 		fetch('/api/updateJwt')
 	})
 

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import { Class, ClassCategory } from "@prisma/client";
 import { UserData } from "../client-layout";
 import { DialogContent, DialogTitle } from "../ui/dialog";
@@ -13,7 +13,8 @@ interface ClassSelectionDialogProps {
 	classes:Class[],
 	userData:UserData,
 	mainClassId:number,
-	characterId:number
+	characterId:number,
+	setDialogOpen:Dispatch<SetStateAction<boolean>>
 }
 
 
@@ -22,7 +23,8 @@ export function ClassSelectionDialog({
 	categories,
 	userData,
 	mainClassId,
-	characterId
+	characterId,
+	setDialogOpen
 	}:ClassSelectionDialogProps){
 		const [mainCategoryId, setMainCategoryId] = useState<string>("")
 		const [selectedClassId, setSelectedClassId] = useState<string>("")
@@ -38,6 +40,7 @@ export function ClassSelectionDialog({
 			characterId: characterId,
 			secondaryClassId: parseInt(selectedClassId)
 		})
+		setDialogOpen(false)
 	}
 
 	return(

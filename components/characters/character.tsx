@@ -8,6 +8,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { socket } from "@/socket";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "../ui/dialog";
 import {ClassSelectionDialog } from "./classSelectionDialog"
+import { useState } from "react";
 interface CharacterProps {
 	classes:Class[],
 	categories:ClassCategory[]
@@ -25,12 +26,14 @@ export function CharacterComponent(
 	}:CharacterProps
 ): React.ReactNode {
 
+	const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+
 
 	return (
 		<div className="h-full">
-			<Dialog>
+			<Dialog open={dialogOpen}>
 
-				<div className="flex">
+				<div className="flex gap-4">
 					<div className="flex-2 h-full">
 						<div className="pb-4">
 							<h1 className="scroll-m-20 text-left text-4xl font-bold tracking-tight text-balance">{character.name}</h1>
@@ -88,7 +91,7 @@ export function CharacterComponent(
 						</div>
 						<div>
 							<h3 className="text-xl pb-4">Réputation:</h3>
-							<div className="px-6 ">
+							<Card className="px-6 mb-4">
 								{character.publicStory.split("LINEBREAK").map((paragraph, paragraphIndex) => (
 									<span
 										key={"publicDescriptionParagraph" + paragraphIndex}
@@ -96,7 +99,7 @@ export function CharacterComponent(
 											{paragraph}
 									</span>
 								))}
-							</div>
+							</Card>
 						</div>
 					</div>
 					<div className="flex-1 flex flex-col">
@@ -111,7 +114,7 @@ export function CharacterComponent(
 							{
 								character.selectable && userData && userData.characterId == null
 								?
-								<DialogTrigger className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive font-bold cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3">
+								<DialogTrigger onClick={() => setDialogOpen(true)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive font-bold cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3">
 									Sélectionner ce personnage
 								</DialogTrigger>
 								:
@@ -123,12 +126,12 @@ export function CharacterComponent(
 				{
 					userData?.characterId == character.id
 					?
-						<div className="flex">
+						<div className="flex gap-4">
 							<div className="flex-2 h-full">
 	<>
 									<div>
 										<h3 className="text-xl pb-4">Histoire:</h3>
-										<div className="px-6 ">
+										<Card className="px-6 mb-4">
 											{character.privateStory.split("LINEBREAK").map((paragraph, paragraphIndex) => (
 												<span
 													key={"privateDescriptionParagraph" + paragraphIndex}
@@ -136,11 +139,11 @@ export function CharacterComponent(
 														{paragraph}
 												</span>
 											))}
-										</div>
+										</Card>
 									</div>
 									<div>
 										<h3 className="text-xl pb-4">Talent: {character.talentName}</h3>
-										<div className="px-6 ">
+										<Card className="px-6 mb-4">
 											{character.talentDescription.split("LINEBREAK").map((paragraph, paragraphIndex) => (
 												<span
 													key={"talentParagraph" + paragraphIndex}
@@ -148,11 +151,11 @@ export function CharacterComponent(
 														{paragraph}
 												</span>
 											))}
-										</div>
+										</Card>
 									</div>
 									<div>
 										<h3 className="text-xl pb-4">Faiblesse: {character.weaknessName}</h3>
-										<div className="px-6 ">
+										<Card className="px-6 mb-4">
 											{character.weaknessDescription.split("LINEBREAK").map((paragraph, paragraphIndex) => (
 												<span
 													key={"talentParagraph" + paragraphIndex}
@@ -160,39 +163,39 @@ export function CharacterComponent(
 														{paragraph}
 												</span>
 											))}
-										</div>
+										</Card>
 									</div>
-									<div className="flex  justify-between pb-4">
-										<div className="flex-1">
+									<div className="flex  justify-between pb-4 gap-4">
+										<div className="flex-1 flex flex-col">
 											<h3 className="text-xl pb-4">Motivations: </h3>
-											<span
-												className="text-justify mb-3">
+											<Card
+												className="text-justify mb-3 px-6 flex-1">
 													{character.motivations}
-											</span>
+											</Card>
 										</div>
-										<div className="flex-1">
+										<div className="flex-1 flex flex-col">
 											<h3 className="text-xl pb-4">Peurs: </h3>
-											<span
-												className="text-justify mb-3">
+											<Card
+												className="text-justify mb-3 px-6 flex-1">
 													{character.fears}
-											</span>
+											</Card>
 										</div>
 										
 									</div>
-									<div className="flex  justify-between">
-										<div className="flex-1">
+									<div className="flex  justify-between gap-4">
+										<div className="flex-1 flex flex-col">
 											<h3 className="text-xl pb-4">Aime: </h3>
-											<span
-												className="text-justify mb-3">
+											<Card
+												className="text-justify mb-3 px-6 flex-1">
 													{character.like}
-											</span>
+											</Card>
 										</div>
-										<div className="flex-1">
+										<div className="flex-1 flex flex-col">
 											<h3 className="text-xl pb-4">N'aime pas: </h3>
-											<span
-												className="text-justify mb-3">
+											<Card
+												className="text-justify mb-3 px-6 flex-1">
 													{character.dislike}
-											</span>
+											</Card>
 										</div>
 									</div>
 								</>
@@ -212,6 +215,7 @@ export function CharacterComponent(
 							userData={userData}
 							mainClassId={character.mainClassId}
 							characterId={character.id}
+							setDialogOpen={setDialogOpen}
 						/>
 					:
 					null	
