@@ -70,7 +70,7 @@ model ClassCategory {
 }
 
 model User {
-  id          Int        @id
+  id          Int        @id @default(autoincrement())
   name        String
   password    String
   roleId      Int

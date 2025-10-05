@@ -54,13 +54,20 @@ export function ClientLayout(
 				.then((res) => res.json())
 				.then((data) => {
 					if (data.userId) {
+						var userRoleValue:string
+						if (usersState.filter((user) => user.id == data.userId).length>0) {
+							userRoleValue=usersState.filter((user) => user.id == data.userId)[0].UserRole.role
+						} else {
+							userRoleValue="player"
+						}
 						const userData:UserData={
 							userId:data.userId,
 							characterId:data.characterId,
-							role:usersState.filter((user) => user.id == data.userId)[0].UserRole.role
+							role:userRoleValue	
 						}
 						setUserData(userData)
 						setIsFetching(false)
+						socket.emit("getUsersServer")
 					}
 					else {
 						setUserData(null)
@@ -84,6 +91,7 @@ export function ClientLayout(
 			})
 			if (response.status == 200) {
 				removeCookie("jwt", {path:"/"})
+				socket.emit("getUsersServer")
 			}
 		}
 	}

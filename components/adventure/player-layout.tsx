@@ -35,7 +35,14 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 	})
 
 	useEffect(() => {
-		var tempCharacters:Character[] = [...characters]
+		var tempCharacters:Character[] = characters.filter((character) => {
+			var connectedUsers = users.filter((user) => user.isConnected)
+			var connectedCharacters = connectedUsers.map((user) => user.characterId)
+			if (connectedCharacters.includes(character.id)) {
+				return true
+			}
+			return false
+		})
 		console.log("dddddddddddd")
 		if (userData) {
 			const currentCharacterIndex:number = tempCharacters.findIndex((character) => character.id == userData.characterId)
@@ -44,9 +51,9 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 				tempCharacters.splice(currentCharacterIndex, 1)
 				tempCharacters.splice(1,0,currentCharacter)
 			}
-			setOrderedCharacters(tempCharacters)
 		}
-	}, [userData, characters])
+		setOrderedCharacters(tempCharacters)
+	}, [userData, characters, users])
 
 	return(
 		<div  className="flex flex-2 flex-col justify-around items-center gap-5">
