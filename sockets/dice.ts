@@ -76,9 +76,6 @@ export function setupDiceHandlers(io: Server) {
 					if (type == RollType.Stat) {
 						diceNumber++;
 					}
-					if (bonusMalusList.length > 0) {
-						diceNumber++;
-					}
 					for (let i = 0; i < diceNumber; i++) {
 						diceIds.push(diceId);
 						diceId++;

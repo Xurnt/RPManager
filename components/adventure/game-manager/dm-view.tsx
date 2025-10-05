@@ -1,5 +1,6 @@
 import { Character, GameSession } from "@prisma/client";
 import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import { Dispatch, SetStateAction, useState } from "react";
 import { RollCreationView } from "./dm-views/roll-creation-view";
 import { RollView } from "./roll-view";
@@ -18,7 +19,8 @@ interface DmViewType {
 	setInteractionTargets:Dispatch<SetStateAction<Character[]>>
 	rollData:DiceRollData[],
 	setRollData:Dispatch<SetStateAction<DiceRollData[]>>,
-	userData:UserData
+	userData:UserData,
+	characters:Character[]
 }
 
 export enum MenuType {
@@ -40,13 +42,17 @@ export function DmView(
 		setInteractionTargets,
 		rollData,
 		setRollData,
-		userData
+		userData,
+		characters
 		
 	}:DmViewType){
 
 	const [gameActive, setGameActive] = useState<boolean>(gameSession.isActive)
 	const [menuType, setMenuType] = useState<MenuType>(MenuType.Main)
 	const [rollMenuType, setRollMenuType] = useState<RollType>(RollType.Standard)
+	const [characterSelectability, setCharacterSelectability] = useState<boolean>(
+		characters.filter((character) => character.selectable).length > 0
+	)
 
 	async function toggleGameSession (status:boolean) {
 		const response = await fetch('/api/gameSessionUpdate', {
@@ -78,6 +84,11 @@ export function DmView(
 		updateInteraction(MenuType.RollCreation)
 	}
 
+	const handleCharacterSelectabilityToggle = (value:boolean) => {
+		setCharacterSelectability(value)
+		socket.emit("setCharacterSelectabilityServer", value)
+	}
+
 	return(
 		<>
 			{
@@ -102,15 +113,19 @@ export function DmView(
 							{
 								menuType == MenuType.Main
 								?
-								<div className="flex justify-around w-full">
-									<div className="flex flex-col justify-around">
+								<div className="flex justify-around w-full py-10">
+									<div className="flex flex-col justify-between">
+										<h1 className="text-center">Setup</h1>
+										<Toggle pressed={characterSelectability} onPressedChange={handleCharacterSelectabilityToggle} className="text-sm cursor-pointer text-white-500">Activer sélection de personnage</Toggle>
+									</div>
+									<div className="flex flex-col justify-between">
 										<h1 className="text-center">Stats</h1>
 										<Button onClick={() => updateInteraction(MenuType.DamageApplication)} className="text-sm cursor-pointer bg-red-500 text-white-500 hover:bg-red-800  hover:text-white-800">Appliquer dégats</Button>
 										<Button onClick={() => updateInteraction(MenuType.Healing)} className="text-sm cursor-pointer bg-green-500 text-white-500 hover:bg-green-800  hover:text-white-800">Soigner</Button>
 										<Button onClick={() => updateInteraction(MenuType.ManaConsumption)} className="text-sm cursor-pointer bg-purple-500 text-white-500 hover:bg-purple-800  hover:text-white-800">Consommer mana</Button>
 										<Button onClick={() => updateInteraction(MenuType.ManaRestauration)} className="text-sm cursor-pointer bg-blue-500 text-white-500 hover:bg-blue-800  hover:text-white-800">Restaurer Mana</Button>
 									</div>
-									<div className="flex flex-col justify-around">
+									<div className="flex flex-col justify-between">
 										<h1 className="text-center">Jets de dé</h1>
 										<Button onClick={() => openRollMenu(RollType.Stat)} className="text-sm cursor-pointer bg-orange-500 text-white-500 hover:bg-orange-800  hover:text-white-800">Jet de statistique</Button>
 										<Button onClick={() => openRollMenu(RollType.Magic)} className="text-sm cursor-pointer bg-pink-500 text-white-500 hover:bg-pink-800  hover:text-white-800">Jet de sort</Button>

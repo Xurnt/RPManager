@@ -50,6 +50,7 @@ export function GameManager(
 							rollData={rollData}
 							setRollData={setRollData}
 							userData={userData}
+							characters={characters}
 						/>
 					:
 						<PlayerView

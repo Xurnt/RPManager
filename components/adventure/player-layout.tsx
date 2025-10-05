@@ -23,25 +23,19 @@ interface PlayerLayoutProps {
 
 export function PlayerLayout({users, characters, userData, gameSession}:PlayerLayoutProps){
 
-	const [charactersState, setCharactersState] = useState<Character[]>(characters)
 	const [interactionTargets, setInteractionTargets] = useState<Character[]>([])
 	const [orderedCharacters, setOrderedCharacters] = useState<Character[]>(characters)
 	const [newInteraction, setNewInteraction] = useState<boolean>(false)
 
 
-	socket.on("getCharactersClient", (data:Character[]) => {
-		console.log("cccccccccccccccc")
-		if (data.length>0) {
-			setCharactersState(data)
-		}
-	})
+
 
 	socket.on("updateStatsClient", () => {
 		socket.emit("getCharactersServer")
 	})
 
 	useEffect(() => {
-		var tempCharacters:Character[] = [...charactersState]
+		var tempCharacters:Character[] = [...characters]
 		console.log("dddddddddddd")
 		if (userData) {
 			const currentCharacterIndex:number = tempCharacters.findIndex((character) => character.id == userData.characterId)
@@ -52,7 +46,7 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 			}
 			setOrderedCharacters(tempCharacters)
 		}
-	}, [userData, charactersState])
+	}, [userData, characters])
 
 	return(
 		<div  className="flex flex-2 flex-col justify-around items-center gap-5">

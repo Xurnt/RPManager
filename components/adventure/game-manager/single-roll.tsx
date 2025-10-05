@@ -24,7 +24,7 @@ export function SingleRoll({
 		userData
 	}:SingleRollProps){
 
-		const [totalRollValue, setTotalRollValue] = useState<number>(0)
+		const [totalRollValue, setTotalRollValue] = useState<number>(diceRollData.bonusMalusValue)
 		const [activeDiceNumber, setActiveDiceNumber] = useState<number>(diceRollData.diceIds.length)
 		const [isInputingMana, setIsInputingMana] = useState<boolean>(true)
 		const [manaUsage, setManaUsage] = useState<string>("")
@@ -60,6 +60,7 @@ export function SingleRoll({
 				socket.emit("getCharactersServer")
 			}
 		})
+		
 
 
 	return(
@@ -159,6 +160,15 @@ export function SingleRoll({
 									activeDiceNumber={activeDiceNumber}
 								/>
 								{
+									diceRollData.bonusMalusValue != 0
+									?
+										<span className="flex flex-1 justify-center text-center items-center">
+											{diceRollData.bonusMalusValue}
+										</span>
+									:
+										null
+								}
+								{
 									diceRollData.type==RollType.Magic
 									?
 										<span className="flex flex-1 justify-center text-center items-center">
@@ -177,7 +187,7 @@ export function SingleRoll({
 								<span className="flex flex-1 justify-center text-center items-center">{diceRollData.successScore}</span>
 							</div>
 						</div>
-						<div className="flex flex-col gap-4 flex-1 justify-center">
+						<div className="flex flex-col gap-4 flex-1 justify-end">
 							{
 								activeDiceNumber == 0
 								?

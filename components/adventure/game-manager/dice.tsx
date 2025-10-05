@@ -65,13 +65,13 @@ export function Dice({
 
 	socket.on("updateDiceStateClient", (data:UpdateDiceStateRequest) => {
 		if (id == data.id) {
-			setDiceState(data.state)
 			if (data.value) {
 				console.log("Update with value :" + data.value)
 				setValue(data.value)
 				setTotalRollValue(totalRollValue + data.value)
 				setActiveDiceNumber(activeDiceNumber - 1)
 			}
+			setDiceState(data.state)
 		}
 	})
 

@@ -7,12 +7,14 @@ import { Separator } from "./ui/separator";
 import { Character, Class, ClassCategory, GameSession, User, UserRole } from "@prisma/client"
 import { DataPages, Pages } from "@/data/pages";
 import { CharacterClass } from "./character-class/character-class";
+import { CharacterComponent } from "./characters/character";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { LoginForm } from "./login-form";
 import { useCookies } from 'react-cookie';
 import { PlayerLayout } from "./adventure/player-layout";
 import { ClipLoader } from "react-spinners";
+import { socket } from "@/socket";
 
 export interface ClientLayoutProps {
 	characters:Character[],
@@ -42,6 +44,8 @@ export function ClientLayout(
 	const [userData, setUserData] = useState<UserData|null>(null)
 	const [cookie,setCookie, removeCookie] = useCookies(['jwt'])
 	const [isFetching, setIsFetching] = useState<boolean>(true)
+	const [charactersState, setCharactersState] = useState<Character[]>(characters)
+	const [usersState, setUsersState] = useState<(User & {UserRole:UserRole})[]>(users)
 
   useEffect(() => {
 		if (cookie.jwt) {
@@ -53,7 +57,7 @@ export function ClientLayout(
 						const userData:UserData={
 							userId:data.userId,
 							characterId:data.characterId,
-							role:users.filter((user) => user.id == data.userId)[0].UserRole.role
+							role:usersState.filter((user) => user.id == data.userId)[0].UserRole.role
 						}
 						setUserData(userData)
 						setIsFetching(false)
@@ -64,6 +68,8 @@ export function ClientLayout(
 				})
 			} else if (userData){
 				setUserData(null)
+				setIsFetching(false)
+			} else {
 				setIsFetching(false)
 			}
   }, [cookie])
@@ -81,15 +87,36 @@ export function ClientLayout(
 			}
 		}
 	}
+	
+	socket.on("getCharactersClient", (data:Character[]) => {
+		if (data.length>0) {
+			setCharactersState(data)
+		}
+	})
+
+	socket.on("getUsersClient", (data:(User & {UserRole:UserRole})[]) => {
+		if (data.length>0) {
+			setUsersState(data)
+		}
+	})
+	
+	socket.on("selectCharacterClient", () => {
+		socket.emit("getUsersServer")
+		fetch('/api/updateJwt')
+	})
+
+	socket.on("setCharacterSelectabilityClient", () => {
+		socket.emit("getCharactersServer")
+	})
+
 
 	return(
 
 	<Dialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen}>
 		<SidebarProvider>
-				<AppSidebar characters={characters} classcategories={classCategories} classes={classes} setDataPage={setDataPage} />
+				<AppSidebar characters={charactersState} classcategories={classCategories} classes={classes} setDataPage={setDataPage} />
 				<SidebarInset>
 					<header className="p-10 justify-between flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-
 						<div className="flex items-center gap-2 px-4">
 							<SidebarTrigger className="-ml-1" />
 							<Separator
@@ -102,7 +129,6 @@ export function ClientLayout(
 								<Button className="cursor-pointer">Connecte toi bébou 😗</Button>
 							</DialogTrigger>
 						}
-
 					</header>
 					<DialogContent>
 						<DialogTitle className="sr-only"/>
@@ -123,11 +149,18 @@ export function ClientLayout(
 											/>
 								</div>
 								:
-									<PlayerLayout gameSession={gameSession} users={users} characters={characters} userData={userData} />
+									<PlayerLayout gameSession={gameSession} users={usersState} characters={charactersState} userData={userData} />
 								:null
 							:null
 						}
-						{dataPage.page == Pages.Character? <h1>Character</h1> : null}
+						{dataPage.page == Pages.Character?
+							<CharacterComponent
+								classes={classes}
+								character={charactersState.filter((character:Character)=>character.id == dataPage.dataId)[0]}
+								userData={userData}
+								categories={classCategories}
+							/>
+						: null}
 						{
 							dataPage.page == Pages.Class && dataPage.dataId
 							?
@@ -140,7 +173,7 @@ export function ClientLayout(
 						{dataPage.page == Pages.World? <h1>World</h1> : null}
 					</div>
 				</SidebarInset>
-		</SidebarProvider>
+			</SidebarProvider>
 		</Dialog>
 	)
 }

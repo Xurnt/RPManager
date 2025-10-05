@@ -5,6 +5,7 @@ import next from "next";
 import { setupInteractionHandlers } from "../sockets/interaction.ts";
 import { setupCharactersHandlers } from "../sockets/characters.ts";
 import { setupStatsHandlers } from "../sockets/stats.ts";
+import { setupUsersHandlers } from "../sockets/users.ts";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "0.0.0.0";
@@ -22,6 +23,7 @@ app.prepare().then(() => {
 	setupInteractionHandlers(socketServer);
 	setupCharactersHandlers(socketServer);
 	setupStatsHandlers(socketServer);
+	setupUsersHandlers(socketServer);
 	httpServer
 		.once("error", (err) => {
 			console.error(err);
