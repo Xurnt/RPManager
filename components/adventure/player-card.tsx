@@ -11,6 +11,8 @@ import { Character, User } from "@prisma/client"
 import { Progress } from "../ui/progress"
 import { Dispatch, SetStateAction } from "react"
 import { Avatar, AvatarImage } from "../ui/avatar"
+import { CircleQuestionMark } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 interface PlayerCardProps {
 	character:Character
 	user: User,
@@ -43,12 +45,15 @@ export function PlayerCard(
 	return(
 <Card
 	className={
-		"flex flex-col justify-stretch gap-2 " +
+		"flex flex-col justify-stretch gap-1 " +
 		(isUserDm ? "cursor-pointer" : "") +
 		(isCurrentUser? "bg-slate-800 border-3":"")
 	}
 	onClick={addNewInteractionTarget}
 >
+	<div className="flex w-full justify-end px-5">
+		
+	</div>
   <div className="flex flex-3 justify-between items-center gap-4 px-5">
 		<div className={"flex flex-1 justify-center"}>
 			<Avatar className="size-15">
@@ -56,9 +61,38 @@ export function PlayerCard(
 			</Avatar>
 		</div>
 		<div className="flex flex-1 flex-col justify-around items-end">
-			<CardTitle className={"text-left text-base"}>{character.name}</CardTitle>
-			<CardDescription className={"text-left text-xs"}>{user.name}</CardDescription>
+			<CardTitle className={"text-left text-right"}>{character.name}</CardTitle>
+			<CardDescription className={"text-right text-xs"}>{user.name}</CardDescription>
 		</div>
+		{
+			isUserDm || isCurrentUser
+			?
+			<Tooltip>
+				<TooltipTrigger>
+					<CircleQuestionMark />
+				</TooltipTrigger>
+				<TooltipContent className="flex flex-col gap-2 max-w-[50vw] px-4 mx-4">
+					<span className="text-left font-bold">Talent: {character.talentName}</span>
+					{character.talentDescription.split("LINEBREAK").map((paragraph, paragraphIndex) => (
+						<span
+							key={"talentParagraph" + paragraphIndex}
+							className="text-left mb-3 block">
+								{paragraph}
+						</span>
+					))}
+					<span className="text-left font-bold">Faiblesse: {character.weaknessName}</span>
+					{character.weaknessDescription.split("LINEBREAK").map((paragraph, paragraphIndex) => (
+						<span
+							key={"weaknessParagraph" + paragraphIndex}
+							className="text-left mb-3 block">
+								{paragraph}
+						</span>
+					))}
+				</TooltipContent>
+			</Tooltip>
+			:
+				null
+		}
   </div>
   <CardContent className="flex flex-1 gap-4">
 		<div className="flex flex-col justify-around flex-1">

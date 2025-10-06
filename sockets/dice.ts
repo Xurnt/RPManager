@@ -59,6 +59,7 @@ export function setupDiceHandlers(io: Server) {
 				});
 				if (targetCharacter) {
 					let bonusMalusValue: number = 0;
+					bonusMalusValue += targetCharacter.corruption;
 					for (let bonusMalusItem of bonusMalusList) {
 						switch (bonusMalusItem.operation) {
 							case BonusMalusOperation.BONUS:

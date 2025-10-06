@@ -124,7 +124,7 @@ export function CharacterComponent(
 					</div>
 				</div>
 				{
-					userData?.characterId == character.id
+					userData?.characterId == character.id || userData?.role == "dm"
 					?
 						<div className="flex gap-4">
 							<div className="flex-2 h-full">
@@ -158,7 +158,7 @@ export function CharacterComponent(
 										<Card className="px-6 mb-4">
 											{character.weaknessDescription.split("LINEBREAK").map((paragraph, paragraphIndex) => (
 												<span
-													key={"talentParagraph" + paragraphIndex}
+													key={"weaknessParagraph" + paragraphIndex}
 													className="text-justify mb-3 block">
 														{paragraph}
 												</span>
