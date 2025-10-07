@@ -30,7 +30,6 @@ export default async function handler(
 			const cookie = serialize("jwt", token, {
 				httpOnly: false,
 				secure: process.env.NODE_ENV === "production",
-				maxAge: 60 * 60 * 24 * 7, // One week
 				path: "/",
 			});
 			await prisma.user.update({

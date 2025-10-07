@@ -153,7 +153,7 @@ export function SingleRoll({
 								<Dice
 									totalRollValue={totalRollValue}
 									setTotalRollValue={setTotalRollValue}
-									maxValue={100}
+									maxValue={diceRollData.normalDice}
 									canInteract={canInteract}
 									id={diceRollData.diceIds[1]}
 									setActiveDiceNumber={setActiveDiceNumber}

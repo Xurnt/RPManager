@@ -17,6 +17,7 @@ export function setupStatsHandlers(io: Server) {
 
 		socket.on("updateStatsServer", async (data: StatBodyUpdateRequest) => {
 			const { value, targets, stat, type, currentStat } = data;
+			console.log(data);
 			for (let targetId of targets) {
 				const targetCharacter = await prisma.character.findUnique({
 					where: {

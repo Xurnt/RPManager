@@ -8,12 +8,14 @@ import { useState } from "react"
 import { MenuType } from "../dm-view"
 import { socket } from "@/socket"
 import { CurrentStatName, StatName, UpdateStat, UpdateType } from "@/data/stats"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { IntegerUpdateOperation } from "@/data/operation"
 
 interface AddDamageType {
 	interactionTargets:Character[],
 	removeInteractionTarget: (targetId:number)=> void,
 	updateInteraction:(menu:MenuType, status:boolean) => void,
-	updateType:UpdateType,
 	updateStat:UpdateStat
 }
 
@@ -23,52 +25,22 @@ interface UpdateStatType {
 	currentStat: CurrentStatName
 }
 
-interface UpdateStatsType{
-	updateStat:UpdateStatType
-	updateType:string
-}
-
-const updateStatsType:UpdateStatsType[][] = [
-	[
-		{
-			updateStat:
-				{
-					name:"vitalité",
-					stat:StatName.VITALITY,
-					currentStat:CurrentStatName.VITALITY,
-				},
-			updateType:"Récupérer"
-		},
-		{
-			updateStat:
-				{
-					name:"vitalité",
-					stat:StatName.VITALITY,
-					currentStat:CurrentStatName.VITALITY,
-				},
-			updateType:"Retirer"
-		},
-	],
-	[
-		{
-			updateStat:
-				{
-					name:"mana",
-					stat:StatName.MANA,
-					currentStat:CurrentStatName.MANA,
-				},
-			updateType:"Récupérer"
-		},
-		{
-			updateStat:
-				{
-					name:"mana",
-					stat:StatName.MANA,
-					currentStat:CurrentStatName.MANA,
-				},
-			updateType:"Retirer"
-		},
-	]
+const updateStatsType:UpdateStatType[] = [
+	{
+		name:"vitalité",
+		stat:StatName.VITALITY,
+		currentStat:CurrentStatName.VITALITY,
+	},
+	{
+		name:"mana",
+		stat:StatName.MANA,
+		currentStat:CurrentStatName.MANA,
+	},
+	{
+		name:"corruption",
+		stat:StatName.CORRUPTION,
+		currentStat:CurrentStatName.CORRUPTION,
+	},
 ]
 
 
@@ -77,17 +49,21 @@ export function UpdateStatView(
 			interactionTargets,
 			removeInteractionTarget,
 			updateInteraction,
-			updateType,
 			updateStat
 		}:AddDamageType
 ){
 
 	const [updateValue, setUpdateValue] = useState<string>("")
-	const [currentUpdateStatsType, setCurrentUpdateStatsType] =	useState<UpdateStatsType>(updateStatsType[updateStat][updateType])
+	const [currentUpdateStatsType, setCurrentUpdateStatsType] =	useState<UpdateStatType>(updateStatsType[updateStat])
+	const [operationValue, setOperationValue] = useState<IntegerUpdateOperation>(IntegerUpdateOperation.ADD)
 	const handleChange = (event:React.ChangeEvent<HTMLInputElement>) => {
 		if ((!isNaN(Number(event.target.value))) || event.target.value=="") {
 			setUpdateValue(event.target.value)
 		}
+	}
+
+	const handleOperationValueChange = (value:string) => {
+		setOperationValue(parseInt(value))
 	}
 
 	async function handleSubmit() {
@@ -96,9 +72,9 @@ export function UpdateStatView(
 			{
 				value:parseInt(updateValue),
 				targets:interactionTargets.map((interactionTarget) => interactionTarget.id),
-				currentStat: currentUpdateStatsType.updateStat.currentStat,
-				type: updateType,
-				stat: currentUpdateStatsType.updateStat.stat,
+				currentStat: currentUpdateStatsType.currentStat,
+				stat: currentUpdateStatsType.stat,
+				type: operationValue
 			}
 		)
 
@@ -111,11 +87,12 @@ export function UpdateStatView(
 
 	return(
 		<>
-			<h1 className="text-center text-2xl text-bold pb-5">{currentUpdateStatsType.updateType + " " + currentUpdateStatsType.updateStat.name}</h1>
+			<h1 className="text-center text-2xl text-bold pb-5">{"Modifier " + currentUpdateStatsType.name}</h1>
 			<div className="flex-1">
 				<div className="flex justify-around pb-4">
 					<h2 className="flex-1 text-center">Cibles</h2>
-					<h2 className="flex-1 text-center">{currentUpdateStatsType.updateStat.name[0].toUpperCase() + currentUpdateStatsType.updateStat.name.substring(1)}</h2>
+					<h2 className="flex-1 text-center">{currentUpdateStatsType.name[0].toUpperCase() + currentUpdateStatsType.name.substring(1)}</h2>
+					<h2 className="flex-1"></h2>
 					<div className="flex-1"></div>
 				</div>
 				<div className="flex-2 flex justify-around">
@@ -136,6 +113,18 @@ export function UpdateStatView(
 							onChange={handleChange}
 							value={updateValue}
 						/>
+					</div>
+					<div className="flex-1 flex justify-center">
+						<RadioGroup defaultValue="add" onValueChange={handleOperationValueChange}>
+							<div className="flex items-center space-x-2">
+								<RadioGroupItem value={IntegerUpdateOperation.ADD.toString()} id="add" className="cursor-pointer"/>
+								<Label htmlFor="add" className="cursor-pointer">Ajout</Label>
+							</div>
+							<div className="flex items-center space-x-2">
+								<RadioGroupItem value={IntegerUpdateOperation.REMOVE.toString()} id="remove" className="cursor-pointer"/>
+								<Label htmlFor="remove" className="cursor-pointer">Suppression</Label>
+							</div>
+						</RadioGroup>
 					</div>
 					<div className="flex justify-center align-center flex-1">
 						<Button onClick={handleSubmit} className="cursor-pointer">Appliquer</Button>

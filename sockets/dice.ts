@@ -14,6 +14,7 @@ export interface DiceRollRequest {
 	successScore: number;
 	targets: number[];
 	type: RollType;
+	normalDice: number;
 }
 
 export interface DiceRollData {
@@ -26,6 +27,7 @@ export interface DiceRollData {
 	maxManaUsage?: number;
 	diceIds: number[];
 	type: RollType;
+	normalDice: number;
 }
 
 export interface UpdateDiceStateRequest {
@@ -47,9 +49,10 @@ export function setupDiceHandlers(io: Server) {
 	io.on("connection", (socket: Socket) => {
 		console.log("New /dice connection:", socket.id);
 
-		socket.on("createRoll", async (rollRequest: DiceRollRequest) => {
+		socket.on("createRollServer", async (rollRequest: DiceRollRequest) => {
 			console.log(rollRequest);
-			const { bonusMalusList, stat, successScore, targets, type } = rollRequest;
+			const { bonusMalusList, stat, successScore, targets, type, normalDice } =
+				rollRequest;
 			var responseData: DiceRollData[] = [];
 			for (let targetId of targets) {
 				const targetCharacter = await prisma.character.findUnique({
@@ -59,7 +62,7 @@ export function setupDiceHandlers(io: Server) {
 				});
 				if (targetCharacter) {
 					let bonusMalusValue: number = 0;
-					bonusMalusValue += targetCharacter.corruption;
+					bonusMalusValue -= targetCharacter.currentCorruption;
 					for (let bonusMalusItem of bonusMalusList) {
 						switch (bonusMalusItem.operation) {
 							case BonusMalusOperation.BONUS:
@@ -90,6 +93,7 @@ export function setupDiceHandlers(io: Server) {
 						diceIds: diceIds,
 						type: type,
 						id: diceRollId,
+						normalDice: normalDice,
 					};
 					if (stat) {
 						responseDataBody.statDiceValue = targetCharacter[stat];
@@ -100,7 +104,7 @@ export function setupDiceHandlers(io: Server) {
 					responseData.push(responseDataBody);
 					diceRollId++;
 				}
-				io.sockets.emit("statDicePlayerView", responseData);
+				io.sockets.emit("createRollClient", responseData);
 			}
 		});
 

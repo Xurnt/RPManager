@@ -102,8 +102,8 @@ export function PlayerCard(
 			<Progress className='[&>*]:bg-blue-500' value={character.currentMana* 100 /character.mana}/>
 		</div>
 		<div className="flex flex-col justify-around flex-1">
-			<span className="text-center text-sm block">{character.corruption}</span>
-			<Progress className='[&>*]:bg-purple-500' value={character.corruption}/>
+			<span className="text-center text-sm block">{character.currentCorruption}</span>
+			<Progress className='[&>*]:bg-purple-500' value={character.currentCorruption* 100 /character.corruption}/>
 			<span></span>
 			<span></span>
 		</div>

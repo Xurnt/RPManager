@@ -25,10 +25,9 @@ interface DmViewType {
 
 export enum MenuType {
 	Main,
-	DamageApplication,
-	Healing,
-	ManaConsumption,
-	ManaRestauration,
+	UpdateVitality,
+	UpdateMana,
+	UpdateCorruption,
 	RollCreation,
 	RollView
 }
@@ -120,10 +119,9 @@ export function DmView(
 									</div>
 									<div className="flex flex-col justify-between">
 										<h1 className="text-center">Stats</h1>
-										<Button onClick={() => updateInteraction(MenuType.DamageApplication)} className="text-sm cursor-pointer bg-red-500 text-white-500 hover:bg-red-800  hover:text-white-800">Appliquer dégats</Button>
-										<Button onClick={() => updateInteraction(MenuType.Healing)} className="text-sm cursor-pointer bg-green-500 text-white-500 hover:bg-green-800  hover:text-white-800">Soigner</Button>
-										<Button onClick={() => updateInteraction(MenuType.ManaConsumption)} className="text-sm cursor-pointer bg-purple-500 text-white-500 hover:bg-purple-800  hover:text-white-800">Consommer mana</Button>
-										<Button onClick={() => updateInteraction(MenuType.ManaRestauration)} className="text-sm cursor-pointer bg-blue-500 text-white-500 hover:bg-blue-800  hover:text-white-800">Restaurer Mana</Button>
+										<Button onClick={() => updateInteraction(MenuType.UpdateVitality)} className="text-sm cursor-pointer bg-red-500 text-white-500 hover:bg-red-800  hover:text-white-800">Modifier vitalité</Button>
+										<Button onClick={() => updateInteraction(MenuType.UpdateMana)} className="text-sm cursor-pointer bg-blue-500 text-white-500 hover:bg-blue-800  hover:text-white-800">Modifier mana</Button>
+										<Button onClick={() => updateInteraction(MenuType.UpdateCorruption)} className="text-sm cursor-pointer bg-purple-500 text-white-500 hover:bg-purple-800  hover:text-white-800">Modifier corruption</Button>
 									</div>
 									<div className="flex flex-col justify-between">
 										<h1 className="text-center">Jets de dé</h1>
@@ -136,53 +134,37 @@ export function DmView(
 									<div className="flex flex-col w-full">
 										<div className="flex flex-col flex-1">
 											{
-												menuType == MenuType.DamageApplication
+												menuType == MenuType.UpdateVitality
 												?
 													<UpdateStatView
 														interactionTargets={interactionTargets}
 														removeInteractionTarget={removeInteractionTarget}
 														updateInteraction={updateInteraction}
 														updateStat={UpdateStat.VITALITY}
-														updateType={UpdateType.REMOVE}
 													/>
 												:
 													null
 											}
 											{
-												menuType == MenuType.Healing
-												?
-													<UpdateStatView
-														interactionTargets={interactionTargets}
-														removeInteractionTarget={removeInteractionTarget}
-														updateInteraction={updateInteraction}
-														updateStat={UpdateStat.VITALITY}
-														updateType={UpdateType.ADD}
-													/>
-												:
-													null
-											}
-											{
-												menuType == MenuType.ManaConsumption
+												menuType == MenuType.UpdateMana
 												?
 													<UpdateStatView
 														interactionTargets={interactionTargets}
 														removeInteractionTarget={removeInteractionTarget}
 														updateInteraction={updateInteraction}
 														updateStat={UpdateStat.MANA}
-														updateType={UpdateType.REMOVE}
 													/>
 												:
 													null
 											}
 											{
-												menuType == MenuType.ManaRestauration
+												menuType == MenuType.UpdateCorruption
 												?
 													<UpdateStatView
 														interactionTargets={interactionTargets}
 														removeInteractionTarget={removeInteractionTarget}
 														updateInteraction={updateInteraction}
-														updateStat={UpdateStat.MANA}
-														updateType={UpdateType.ADD}
+														updateStat={UpdateStat.CORRUPTION}
 													/>
 												:
 													null

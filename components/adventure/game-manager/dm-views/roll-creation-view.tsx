@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { MenuType } from "../dm-view"
 import { socket } from "@/socket";
 import { BonusMalus, BonusMalusOperation, RollType, StatName, stats } from "@/data/roll"
+import { IntegerUpdateOperation } from "@/data/operation"
 import { DiceRollData, DiceRollRequest } from "@/sockets/dice"
 
 interface RollViewType {
@@ -21,10 +22,6 @@ interface RollViewType {
 
 
 
-enum BonusMalusListAction {
-	ADD,
-	REMOVE
-}
 
 export function RollCreationView({
 	rollType,
@@ -39,8 +36,9 @@ export function RollCreationView({
 	const [bonusMalusIndex, setBonusMalusIndex] = useState<number>(1)
 	const [bonusMalusList, setBonusMalusList] = useState<BonusMalus[]>([])
 	const [successScore, setSuccessScore] = useState<string>("")
+	const [normalDiceAmount, setNormalDiceAmount] = useState<string>("100")
 
-	socket.on("statDicePlayerView", (data: DiceRollData[]) => {
+	socket.on("createRollClient", (data: DiceRollData[]) => {
 		updateInteraction(MenuType.RollView, true)
 		setRollData(data)
 	})
@@ -57,6 +55,11 @@ export function RollCreationView({
 		setStat(value)
 	}
 
+	const handleNormalDiceAmount = (event:React.ChangeEvent<HTMLInputElement>) => {
+		if ((!isNaN(Number(event.target.value))) || event.target.value=="") {
+			setNormalDiceAmount(event.target.value)
+		}
+	}
 
 	const handleSuccessScore = (event:React.ChangeEvent<HTMLInputElement>) => {
 		if ((!isNaN(Number(event.target.value))) || event.target.value=="") {
@@ -69,9 +72,9 @@ export function RollCreationView({
 	}
 
 
-	const updateBonusMalusList = (action:BonusMalusListAction, option:UpdateBonusMalusListOption) => {
+	const updateBonusMalusList = (action:IntegerUpdateOperation, option:UpdateBonusMalusListOption) => {
 		var tempBonusMalusList = [...bonusMalusList]
-			if(action == BonusMalusListAction.ADD && option.operationValue && bonusMalusValue != "") {
+			if(action == IntegerUpdateOperation.ADD && option.operationValue && bonusMalusValue != "") {
 				tempBonusMalusList.push({
 					operation:option.operationValue,
 					id: bonusMalusIndex,
@@ -79,7 +82,7 @@ export function RollCreationView({
 				})
 				setBonusMalusIndex(bonusMalusIndex + 1)
 			}
-			if(action == BonusMalusListAction.REMOVE && option.id) {
+			if(action == IntegerUpdateOperation.REMOVE && option.id) {
 				const bonusMalusToRemoveIndex = tempBonusMalusList.findIndex((bonusMalus) => bonusMalus.id == option.id)
 				console.log(bonusMalusToRemoveIndex)
 				tempBonusMalusList.splice(bonusMalusToRemoveIndex, 1)
@@ -95,12 +98,13 @@ export function RollCreationView({
 				targets:interactionTargets.map((interactionTarget) => interactionTarget.id),
 				bonusMalusList: bonusMalusList,
 				successScore:parseInt(successScore),
-				type:rollType
+				type:rollType,
+				normalDice:parseInt(normalDiceAmount)
 			}
 			if (stat) {
 				rollCreationData.stat = stat	
 			}
-			socket.emit("createRoll", rollCreationData)
+			socket.emit("createRollServer", rollCreationData)
 		}
 	}
 
@@ -116,6 +120,7 @@ export function RollCreationView({
 						:
 							null
 					}
+					<h2 className="flex-1 text-center">Dé de base</h2>
 					<h2 className="flex-1 text-center">Bonus/Malus</h2>
 					<h2 className="flex-1 text-center">Score à atteindre</h2>
 					<div className="flex-1"></div>
@@ -162,6 +167,13 @@ export function RollCreationView({
 							</div>
 						: null
 					}
+					<div className="flex-1 flex justify-around items-center">
+						<Input
+							className="mx-10"
+							onChange={handleNormalDiceAmount}
+							value={normalDiceAmount}
+						/>
+					</div>
 					<div className="flex-1 flex justify-around gap-4 items-center">
 						<Input
 							onChange={handleBonusMalusChange}
@@ -171,14 +183,14 @@ export function RollCreationView({
 							<Button
 								size="icon"
 								className="cursor-pointer"
-								onClick={() => updateBonusMalusList(BonusMalusListAction.ADD, {operationValue:BonusMalusOperation.BONUS})}
+								onClick={() => updateBonusMalusList(IntegerUpdateOperation.ADD, {operationValue:BonusMalusOperation.BONUS})}
 							>
 								<Plus/>
 							</Button>
 							<Button
 								size="icon"
 								className="cursor-pointer"
-								onClick={() => updateBonusMalusList(BonusMalusListAction.ADD, {operationValue:BonusMalusOperation.MALUS})}
+								onClick={() => updateBonusMalusList(IntegerUpdateOperation.ADD, {operationValue:BonusMalusOperation.MALUS})}
 							>
 								<Minus/>
 							</Button>
@@ -203,7 +215,7 @@ export function RollCreationView({
 								<Badge
 									key={"bonusMalus" + bonusMalus.id.toString()}
 									className={"basis-1/3 cursor-pointer " + (bonusMalus.operation == BonusMalusOperation.BONUS? "bg-green-500 hover:bg-green-800" : "bg-red-500 hover:bg-red-800")}
-									onClick={() => updateBonusMalusList(BonusMalusListAction.REMOVE, {id:bonusMalus.id})}
+									onClick={() => updateBonusMalusList(IntegerUpdateOperation.REMOVE, {id:bonusMalus.id})}
 								>
 									{bonusMalus.operation + " " + bonusMalus.value}
 								</Badge>

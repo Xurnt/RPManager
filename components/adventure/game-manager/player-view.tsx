@@ -30,7 +30,7 @@ export function PlayerView({
 
 	const [playerView, setPlayerView] = useState<PlayerViews>(PlayerViews.Main)
 
-	socket.on("statDicePlayerView", (data: DiceRollData[]) => {
+	socket.on("createRollClient", (data: DiceRollData[]) => {
 		setRollData(data)
 		setPlayerView(PlayerViews.Roll)
 		setInteractionTargets(characters.filter((character) => data.map((dataItem) => dataItem.target).includes(character.id)))
