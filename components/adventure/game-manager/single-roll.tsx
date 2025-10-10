@@ -12,14 +12,14 @@ import { Button } from "@/components/ui/button";
 import { socket } from "@/socket";
 interface SingleRollProps{
 	diceRollData:DiceRollData
-	interactionTargets:Character[],
+	interactionTarget:Character,
 	canInteract:boolean,
 	userData:UserData
 }
 
 export function SingleRoll({
 		diceRollData,
-		interactionTargets,
+		interactionTarget,
 		canInteract,
 		userData
 	}:SingleRollProps){
@@ -28,6 +28,8 @@ export function SingleRoll({
 		const [activeDiceNumber, setActiveDiceNumber] = useState<number>(diceRollData.diceIds.length)
 		const [isInputingMana, setIsInputingMana] = useState<boolean>(true)
 		const [manaUsage, setManaUsage] = useState<string>("")
+		const [currentDestiny, setCurrentDestiny] = useState<number>(diceRollData.destiny)
+
 
 		const handleManaUsageChange = (event:React.ChangeEvent<HTMLInputElement>) => {
 			if ((!isNaN(Number(event.target.value))) || event.target.value=="") {
@@ -74,7 +76,7 @@ export function SingleRoll({
 					""
 			)
 		}>
-		<h1 className="text-center text-base font-bold">Jet de {interactionTargets.filter((interactionTarget) => interactionTarget.id ==  diceRollData.target)[0].name}</h1>
+		<h1 className="text-center text-base font-bold">Jet de {interactionTarget.name}</h1>
 		{
 				diceRollData.type == RollType.Magic && isInputingMana && userData.characterId==diceRollData.target
 				?
@@ -82,10 +84,14 @@ export function SingleRoll({
 						<div className="flex gap-2 flex-4 flex-col">
 							<div className="flex gap-2 align-center justify-around ">
 								<span className="flex flex-1 justify-center text-center items-center">Mana à utiliser</span>
+								<span className="flex flex-1 justify-center text-center items-center">Objectif</span>
 								<span className="flex flex-1 justify-center text-center items-center"></span>
 							</div>
 							<div className="flex gap-2 align-center justify-around ">
-								<Input onChange={handleManaUsageChange} className="flex-1" value={manaUsage} />
+								<div className="flex-1" >
+									<Input onChange={handleManaUsageChange}value={manaUsage} />
+								</div>
+								<span className="flex flex-1 justify-center text-center items-center">{diceRollData.successScore}</span>
 								<div className="flex-1 flex justify-center">
 									<Button
 										onClick={handleConfirmManaUsage}
@@ -146,6 +152,9 @@ export function SingleRoll({
 											id={diceRollData.diceIds[0]}
 											setActiveDiceNumber={setActiveDiceNumber}
 											activeDiceNumber={activeDiceNumber}
+											setCurrentDestiny={setCurrentDestiny}
+											currentDestiny={currentDestiny}
+											targetId={diceRollData.target}
 										/>
 									:
 										null
@@ -158,6 +167,9 @@ export function SingleRoll({
 									id={diceRollData.diceIds[1]}
 									setActiveDiceNumber={setActiveDiceNumber}
 									activeDiceNumber={activeDiceNumber}
+									setCurrentDestiny={setCurrentDestiny}
+									currentDestiny={currentDestiny}
+									targetId={diceRollData.target}
 								/>
 								{
 									diceRollData.bonusMalusValue != 0
@@ -191,13 +203,33 @@ export function SingleRoll({
 							{
 								activeDiceNumber == 0
 								?
-									<motion.h2 className="text-center text-lg font-bold" initial={{ scale: 0 }} animate={{ scale: 1 }} >
+									<motion.h2
+										className={"text-center text-lg font-bold " +
+											(
+												diceRollData.type == RollType.Magic && totalRollValue > 100
+												?
+													totalRollValue%2 == 0
+													?
+														"bg-green-500 rounded-xl p-4 "
+													:
+														"bg-red-500 rounded-xl p-4 "
+												:
+													""
+											)
+										}
+										initial={{ scale: 0 }}
+										animate={{ scale: 1 }}
+									>
 										{
 												totalRollValue < diceRollData.successScore
 												?
 													"GRONAZ"
 												:
-													"GG BG"
+													diceRollData.type == RollType.Magic && totalRollValue > 100
+													?
+														"EXPLOSION ARCANIQUE"
+													:
+														"GG BG"
 										}
 									</motion.h2>
 								:

@@ -2,15 +2,16 @@ import { prisma } from "../server/prisma";
 import {
 	BonusMalus,
 	BonusMalusOperation,
+	DiceState,
+	RollStatName,
 	RollType,
-	StatName,
 } from "../data/roll.ts";
 import { Server, Socket } from "socket.io";
-import { DiceState } from "@/components/adventure/game-manager/dice.tsx";
+import { getRandomIntInclusive } from "../utils/math";
 
 export interface DiceRollRequest {
 	bonusMalusList: BonusMalus[];
-	stat?: StatName;
+	stat?: RollStatName;
 	successScore: number;
 	targets: number[];
 	type: RollType;
@@ -23,11 +24,12 @@ export interface DiceRollData {
 	bonusMalusValue: number;
 	target: number;
 	statDiceValue?: number;
-	statName?: StatName;
+	statName?: RollStatName;
 	maxManaUsage?: number;
 	diceIds: number[];
 	type: RollType;
 	normalDice: number;
+	destiny: number;
 }
 
 export interface UpdateDiceStateRequest {
@@ -45,102 +47,99 @@ export interface SetManaUsageRequest {
 var diceId = 0;
 var diceRollId = 0;
 
-export function setupDiceHandlers(io: Server) {
-	io.on("connection", (socket: Socket) => {
-		console.log("New /dice connection:", socket.id);
+export function setupDiceHandlers(io: Server, socket: Socket) {
+	socket.on("createRollServer", async (rollRequest: DiceRollRequest) => {
+		console.log(rollRequest);
+		const { bonusMalusList, stat, successScore, targets, type, normalDice } =
+			rollRequest;
+		var responseData: DiceRollData[] = [];
+		for (let targetId of targets) {
+			const targetCharacter = await prisma.character.findUnique({
+				where: {
+					id: targetId,
+				},
+			});
+			if (targetCharacter) {
+				let bonusMalusValue: number = 0;
+				bonusMalusValue -= getRandomIntInclusive(
+					0,
+					targetCharacter.currentCorruption
+				);
 
-		socket.on("createRollServer", async (rollRequest: DiceRollRequest) => {
-			console.log(rollRequest);
-			const { bonusMalusList, stat, successScore, targets, type, normalDice } =
-				rollRequest;
-			var responseData: DiceRollData[] = [];
-			for (let targetId of targets) {
-				const targetCharacter = await prisma.character.findUnique({
-					where: {
-						id: targetId,
-					},
-				});
-				if (targetCharacter) {
-					let bonusMalusValue: number = 0;
-					bonusMalusValue -= targetCharacter.currentCorruption;
-					for (let bonusMalusItem of bonusMalusList) {
-						switch (bonusMalusItem.operation) {
-							case BonusMalusOperation.BONUS:
-								bonusMalusValue += bonusMalusItem.value;
-								break;
-							case BonusMalusOperation.MALUS:
-								bonusMalusValue -= bonusMalusItem.value;
-								break;
-							default:
-								break;
-						}
+				for (let bonusMalusItem of bonusMalusList) {
+					switch (bonusMalusItem.operation) {
+						case BonusMalusOperation.BONUS:
+							bonusMalusValue += bonusMalusItem.value;
+							break;
+						case BonusMalusOperation.MALUS:
+							bonusMalusValue -= bonusMalusItem.value;
+							break;
+						default:
+							break;
 					}
-					var diceIds = [];
-					var diceNumber = 1;
-					if (type == RollType.Stat) {
-						diceNumber++;
-					}
-					for (let i = 0; i < diceNumber; i++) {
-						diceIds.push(diceId);
-						diceId++;
-					}
-
-					var responseDataBody: DiceRollData = {
-						target: targetId,
-						bonusMalusValue: bonusMalusValue,
-						successScore: successScore,
-						statName: stat,
-						diceIds: diceIds,
-						type: type,
-						id: diceRollId,
-						normalDice: normalDice,
-					};
-					if (stat) {
-						responseDataBody.statDiceValue = targetCharacter[stat];
-					}
-					if (type == RollType.Magic) {
-						responseDataBody.maxManaUsage = targetCharacter.currentMana;
-					}
-					responseData.push(responseDataBody);
-					diceRollId++;
 				}
-				io.sockets.emit("createRollClient", responseData);
-			}
-		});
-
-		socket.on(
-			"updateDiceStateServer",
-			(updateStateRequest: UpdateDiceStateRequest) => {
-				io.sockets.emit("updateDiceStateClient", updateStateRequest);
-			}
-		);
-
-		socket.on(
-			"setManaUsageServer",
-			async (updateStateRequest: SetManaUsageRequest) => {
-				const targetCharacter = await prisma.character.findUnique({
-					where: {
-						id: updateStateRequest.characterId,
-					},
-				});
-				if (targetCharacter) {
-					const currentManaPreviousValue = targetCharacter.currentMana;
-					await prisma.character.update({
-						where: {
-							id: targetCharacter.id,
-						},
-						data: {
-							currentMana:
-								currentManaPreviousValue - parseInt(updateStateRequest.mana),
-						},
-					});
-					io.sockets.emit("setManaUsageClient", updateStateRequest);
+				var diceIds = [];
+				var diceNumber = 1;
+				if (type == RollType.Stat) {
+					diceNumber++;
 				}
-			}
-		);
+				for (let i = 0; i < diceNumber; i++) {
+					diceIds.push(diceId);
+					diceId++;
+				}
 
-		socket.on("disconnect", () => {
-			console.log("Dice socket disconnected:", socket.id);
-		});
+				var responseDataBody: DiceRollData = {
+					target: targetId,
+					bonusMalusValue: bonusMalusValue,
+					successScore: successScore,
+					statName: stat,
+					diceIds: diceIds,
+					type: type,
+					id: diceRollId,
+					normalDice: normalDice,
+					destiny: targetCharacter.destiny,
+				};
+				if (stat) {
+					responseDataBody.statDiceValue = targetCharacter[stat];
+				}
+				if (type == RollType.Magic) {
+					responseDataBody.maxManaUsage = targetCharacter.currentMana;
+				}
+				responseData.push(responseDataBody);
+				diceRollId++;
+			}
+			io.sockets.emit("createRollClient", responseData);
+		}
 	});
+
+	socket.on(
+		"updateDiceStateServer",
+		(updateStateRequest: UpdateDiceStateRequest) => {
+			io.sockets.emit("updateDiceStateClient", updateStateRequest);
+		}
+	);
+
+	socket.on(
+		"setManaUsageServer",
+		async (updateStateRequest: SetManaUsageRequest) => {
+			const targetCharacter = await prisma.character.findUnique({
+				where: {
+					id: updateStateRequest.characterId,
+				},
+			});
+			if (targetCharacter) {
+				const currentManaPreviousValue = targetCharacter.currentMana;
+				await prisma.character.update({
+					where: {
+						id: targetCharacter.id,
+					},
+					data: {
+						currentMana:
+							currentManaPreviousValue - parseInt(updateStateRequest.mana),
+					},
+				});
+				io.sockets.emit("setManaUsageClient", updateStateRequest);
+			}
+		}
+	);
 }

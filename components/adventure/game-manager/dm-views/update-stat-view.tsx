@@ -41,6 +41,11 @@ const updateStatsType:UpdateStatType[] = [
 		stat:StatName.CORRUPTION,
 		currentStat:CurrentStatName.CORRUPTION,
 	},
+	{
+		name:"destin",
+		stat:StatName.DESTINY,
+		currentStat:CurrentStatName.DESTINY,
+	},
 ]
 
 
@@ -77,7 +82,6 @@ export function UpdateStatView(
 				type: operationValue
 			}
 		)
-
 	}
 
 	socket.on("updateStatsClient", () => {

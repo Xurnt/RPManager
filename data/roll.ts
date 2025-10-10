@@ -1,4 +1,4 @@
-export enum StatName {
+export enum RollStatName {
 	CURRENT_VITALITY = "currentVitality",
 	CURRENT_MANA = "currentMana",
 	STRENGTH = "strength",
@@ -29,44 +29,50 @@ export interface BonusMalus {
 
 interface Stat {
 	name: string;
-	pgName: StatName;
+	pgName: RollStatName;
 }
 
 export const stats: Stat[] = [
 	{
 		name: "Vitalité",
-		pgName: StatName.CURRENT_VITALITY,
+		pgName: RollStatName.CURRENT_VITALITY,
 	},
 	{
 		name: "Mana",
-		pgName: StatName.CURRENT_MANA,
+		pgName: RollStatName.CURRENT_MANA,
 	},
 	{
 		name: "Force",
-		pgName: StatName.STRENGTH,
+		pgName: RollStatName.STRENGTH,
 	},
 	{
 		name: "Dextérité",
-		pgName: StatName.DEXTERITY,
+		pgName: RollStatName.DEXTERITY,
 	},
 	{
 		name: "Sang-froid",
-		pgName: StatName.COURAGE,
+		pgName: RollStatName.COURAGE,
 	},
 	{
 		name: "Charisme",
-		pgName: StatName.CHARISMA,
+		pgName: RollStatName.CHARISMA,
 	},
 	{
 		name: "Perception",
-		pgName: StatName.PERCEPTION,
+		pgName: RollStatName.PERCEPTION,
 	},
 	{
 		name: "Discrétion",
-		pgName: StatName.DISCRETION,
+		pgName: RollStatName.DISCRETION,
 	},
 	{
 		name: "Savoir",
-		pgName: StatName.KNOWLEDGE,
+		pgName: RollStatName.KNOWLEDGE,
 	},
 ];
+
+export enum DiceState {
+	TO_ROLL,
+	ROLLING,
+	ROLLED,
+}

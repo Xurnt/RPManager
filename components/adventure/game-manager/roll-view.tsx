@@ -37,7 +37,7 @@ export function RollView({
 					<SingleRoll
 						key={"SingleRoll" + diceRollDataItem.target}
 						diceRollData={diceRollDataItem}
-						interactionTargets={interactionTargets}
+						interactionTarget={interactionTargets.filter((interactionTarget) => interactionTarget.id ==  diceRollDataItem.target)[0]}
 						canInteract={diceRollDataItem.target == userData.characterId}
 						userData={userData}
 					/>

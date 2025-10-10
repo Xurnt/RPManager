@@ -12,7 +12,7 @@ import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { LoginForm } from "./login-form";
 import { useCookies } from 'react-cookie';
-import { PlayerLayout } from "./adventure/player-layout";
+import { AdventureLayout } from "./adventure/adventure-layout";
 import { ClipLoader } from "react-spinners";
 import { socket } from "@/socket";
 
@@ -81,7 +81,6 @@ export function ClientLayout(
 			}
   }, [cookie])
 
-	console.log(gameSession)
 	 async function disconnect () {
 		if(userData){
 			const response = await fetch('/api/auth/logout', {
@@ -102,13 +101,25 @@ export function ClientLayout(
 		}
 	})
 
+	socket.on("forceDisconnectClient", () => {
+		socket.emit("getUsersServer")
+	})
+
+
 	socket.on("getUsersClient", (data:(User & {UserRole:UserRole})[]) => {
 		if (data.length>0) {
 			setUsersState(data)
 		}
 	})
+
+	
+
+	socket.on("updateStatsClient", () => {
+		socket.emit("getCharactersServer")
+	})
 	
 	socket.on("selectCharacterClient", () => {
+		console.log("SELECT CHARACTER")
 		socket.emit("getUsersServer")
 		socket.emit("getCharactersServer")
 		fetch('/api/updateJwt')
@@ -117,7 +128,13 @@ export function ClientLayout(
 	socket.on("setCharacterSelectabilityClient", () => {
 		socket.emit("getCharactersServer")
 	})
-
+	
+	socket.on("removeCharacterClient", () => {
+		console.log("UNSELECT CHARACTER")
+		socket.emit("getUsersServer")
+		socket.emit("getCharactersServer")
+		fetch('/api/updateJwt')
+	})
 
 	return(
 
@@ -158,7 +175,7 @@ export function ClientLayout(
 											/>
 								</div>
 								:
-									<PlayerLayout gameSession={gameSession} users={usersState} characters={charactersState} userData={userData} />
+									<AdventureLayout gameSession={gameSession} users={usersState} characters={charactersState} userData={userData} />
 								:null
 							:null
 						}

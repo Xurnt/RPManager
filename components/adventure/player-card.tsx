@@ -56,8 +56,60 @@ export function PlayerCard(
 	</div>
   <div className="flex flex-3 justify-between items-center gap-4 px-5">
 		<div className={"flex flex-1 justify-center"}>
+
 			<Avatar className="size-15">
-				<AvatarImage className="flex object-cover" src={character.picturePath +"/thumbnail.jpg"} />
+				<Tooltip>
+					<TooltipTrigger>
+						<AvatarImage className="flex object-cover" src={character.picturePath +"/thumbnail.jpg"} />
+					</TooltipTrigger>
+					<TooltipContent className="flex flex-col gap-2 max-w-[50vw] p-4">
+						<h4>Stats: </h4>
+						<div className="flex gap-2 mx-4">
+							<div className="flex flex-col items-center">
+								<span className="pb-2">Vitalité: {character.vitality}</span>
+								<span className="pb-2">Mana: {character.mana}</span>
+								<span className="pb-2">Force: {character.strength}</span>
+								<span className="pb-2">Dextérité: {character.dexterity}</span>
+								<span className="pb-2">Sang-froid: {character.courage}</span>
+							</div>
+							<div className="pl-4 flex flex-col items-center justify-between">
+								<span className="pb-2">Charisme: {character.charisma}</span>
+								<span className="pb-2">Perception: {character.perception}</span>
+								<span className="pb-2">Discrétion: {character.discretion}</span>
+								<span className="pb-2">Savoir: {character.knowledge}</span>
+							</div>
+						</div>
+						{
+							isUserDm || isCurrentUser
+							?
+								<>
+									<div>
+										<h4>Talent: {character.talentName}</h4>
+											{character.talentDescription.split("LINEBREAK").map((paragraph, paragraphIndex) => (
+												<span
+													key={"talentParagraph" + paragraphIndex}
+													className="text-left mb-3 block">
+														{paragraph}
+												</span>
+											))}
+									</div>
+										<div>
+										<h4>Faiblesse: {character.weaknessName}</h4>
+											{character.weaknessDescription.split("LINEBREAK").map((paragraph, paragraphIndex) => (
+												<span
+													key={"weaknessParagraph" + paragraphIndex}
+													className="text-left mb-3 block">
+														{paragraph}
+												</span>
+											))}
+									</div>
+								</>
+							:
+								null
+						}
+
+					</TooltipContent>
+				</Tooltip>
 			</Avatar>
 		</div>
 		<div className="flex flex-1 flex-col justify-around items-end">
@@ -94,18 +146,25 @@ export function PlayerCard(
 				null
 		}
   </div>
-  <CardContent className="flex flex-1 gap-4">
-		<div className="flex flex-col justify-around flex-1">
-			<span className="text-center text-sm block">{character.currentVitality}</span>
-			<Progress className='[&>*]:bg-red-500' value={character.currentVitality * 100 /character.vitality}/>
-			<span className="text-center text-sm block">{character.currentMana}</span>
-			<Progress className='[&>*]:bg-blue-500' value={character.currentMana* 100 /character.mana}/>
+  <CardContent className="flex flex-col flex-1 gap-4">
+		<div className="flex justify-around flex-1 gap-4">
+			<div className="flex flex-col flex-1">
+				<span className="text-center text-sm block">{character.currentVitality}</span>
+				<Progress className='[&>*]:bg-red-500' value={character.currentVitality * 100 /character.vitality}/>
+			</div>
+			<div className="flex flex-col flex-1">
+				<span className="text-center text-sm block">{character.currentMana}</span>
+				<Progress className='[&>*]:bg-blue-500' value={character.currentMana* 100 /character.mana}/>
+			</div>
 		</div>
-		<div className="flex flex-col justify-around flex-1">
-			<span className="text-center text-sm block">{character.currentCorruption}</span>
-			<Progress className='[&>*]:bg-purple-500' value={character.currentCorruption* 100 /character.corruption}/>
-			<span></span>
-			<span></span>
+		<div className="flex justify-around flex-1 gap-4">
+			<div className="flex flex-col flex-1">
+				<span className="text-center text-sm block">{character.currentCorruption}</span>
+				<Progress className='[&>*]:bg-purple-500' value={character.currentCorruption* 100 /character.corruption}/>
+			</div>
+			<div className="flex flex-1 justify-center items-center">
+					<span className="border-4 py-2 px-4 rounded-full border-emerald-500">{character.destiny}</span>
+			</div>
 		</div>
 
   </CardContent>

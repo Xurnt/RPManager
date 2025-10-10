@@ -10,6 +10,7 @@ import { socket } from "@/socket";
 import { RollType } from "@/data/roll";
 import { UpdateStat, UpdateType } from "@/data/stats";
 import { UpdateStatView } from "./dm-views/update-stat-view"
+import { DefaultPlayerInteraction, InteractionType } from "./dm-views/default-player-interaction"
 
 interface DmViewType {
 	gameSession:GameSession,
@@ -28,8 +29,11 @@ export enum MenuType {
 	UpdateVitality,
 	UpdateMana,
 	UpdateCorruption,
+	UpdateDestiny,
 	RollCreation,
-	RollView
+	RollView,
+	DisconnectPlayer,
+	UnselectCharacter
 }
 
 export function DmView(
@@ -112,18 +116,21 @@ export function DmView(
 							{
 								menuType == MenuType.Main
 								?
-								<div className="flex justify-around w-full py-10">
-									<div className="flex flex-col justify-between">
+								<div className="flex justify-around w-full py-10 gap-8">
+									<div className="flex flex-1 flex-col justify-start gap-8">
 										<h1 className="text-center">Setup</h1>
 										<Toggle pressed={characterSelectability} onPressedChange={handleCharacterSelectabilityToggle} className="text-sm cursor-pointer text-white-500">Activer sélection de personnage</Toggle>
+										<Button onClick={() => updateInteraction(MenuType.DisconnectPlayer)} className="text-sm cursor-pointer bg-green-600 text-white-500 hover:bg-green-900  hover:text-white-800">Déconnecter joueur</Button>
+										<Button onClick={() => updateInteraction(MenuType.UnselectCharacter)} className="text-sm cursor-pointer bg-indigo-600 text-white-500 hover:bg-indigo-900  hover:text-white-800">Désélectionner personnage</Button>
 									</div>
-									<div className="flex flex-col justify-between">
+									<div className="flex flex-1 flex-col justify-start gap-8">
 										<h1 className="text-center">Stats</h1>
 										<Button onClick={() => updateInteraction(MenuType.UpdateVitality)} className="text-sm cursor-pointer bg-red-500 text-white-500 hover:bg-red-800  hover:text-white-800">Modifier vitalité</Button>
 										<Button onClick={() => updateInteraction(MenuType.UpdateMana)} className="text-sm cursor-pointer bg-blue-500 text-white-500 hover:bg-blue-800  hover:text-white-800">Modifier mana</Button>
 										<Button onClick={() => updateInteraction(MenuType.UpdateCorruption)} className="text-sm cursor-pointer bg-purple-500 text-white-500 hover:bg-purple-800  hover:text-white-800">Modifier corruption</Button>
+										<Button onClick={() => updateInteraction(MenuType.UpdateDestiny)} className="text-sm cursor-pointer bg-zinc-500 text-white-500 hover:bg-zinc-800  hover:text-white-800">Modifier destin</Button>
 									</div>
-									<div className="flex flex-col justify-between">
+									<div className="flex flex-1 flex-col justify-start gap-8">
 										<h1 className="text-center">Jets de dé</h1>
 										<Button onClick={() => openRollMenu(RollType.Stat)} className="text-sm cursor-pointer bg-orange-500 text-white-500 hover:bg-orange-800  hover:text-white-800">Jet de statistique</Button>
 										<Button onClick={() => openRollMenu(RollType.Magic)} className="text-sm cursor-pointer bg-pink-500 text-white-500 hover:bg-pink-800  hover:text-white-800">Jet de sort</Button>
@@ -170,6 +177,18 @@ export function DmView(
 													null
 											}
 											{
+												menuType == MenuType.UpdateDestiny
+												?
+													<UpdateStatView
+														interactionTargets={interactionTargets}
+														removeInteractionTarget={removeInteractionTarget}
+														updateInteraction={updateInteraction}
+														updateStat={UpdateStat.DESTINY}
+													/>
+												:
+													null
+											}
+											{
 												menuType == MenuType.RollCreation
 												?
 													<RollCreationView
@@ -189,6 +208,30 @@ export function DmView(
 														diceRollData={rollData}
 														userData={userData}
 														interactionTargets={interactionTargets}
+													/>
+												:
+													null
+											}
+											{
+												menuType == MenuType.DisconnectPlayer
+												?
+													<DefaultPlayerInteraction
+														removeInteractionTarget={removeInteractionTarget}
+														interactionTargets={interactionTargets}
+														updateInteraction={updateInteraction}
+														interaction={InteractionType.DISCONNECT}
+													/>
+												:
+													null
+											}
+											{
+												menuType == MenuType.UnselectCharacter
+												?
+													<DefaultPlayerInteraction
+														removeInteractionTarget={removeInteractionTarget}
+														interactionTargets={interactionTargets}
+														updateInteraction={updateInteraction}
+														interaction={InteractionType.UNSELECT_CHARACTER}
 													/>
 												:
 													null

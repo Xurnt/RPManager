@@ -21,7 +21,7 @@ interface PlayerLayoutProps {
 	gameSession:GameSession
 }
 
-export function PlayerLayout({users, characters, userData, gameSession}:PlayerLayoutProps){
+export function AdventureLayout({users, characters, userData, gameSession}:PlayerLayoutProps){
 
 	const [interactionTargets, setInteractionTargets] = useState<Character[]>([])
 	const [orderedCharacters, setOrderedCharacters] = useState<Character[]>(characters)
@@ -29,10 +29,6 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 
 
 
-
-	socket.on("updateStatsClient", () => {
-		socket.emit("getCharactersServer")
-	})
 
 	useEffect(() => {
 		var tempCharacters:Character[] = characters.filter((character) => {
@@ -43,7 +39,6 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 			}
 			return false
 		})
-		console.log("dddddddddddd")
 		if (userData) {
 			const currentCharacterIndex:number = tempCharacters.findIndex((character) => character.id == userData.characterId)
 			if (currentCharacterIndex!=-1) {
@@ -84,7 +79,7 @@ export function PlayerLayout({users, characters, userData, gameSession}:PlayerLa
 					}
 				>
 					<CarouselPrevious className="cursor-pointer" />
-					<CarouselContent className="flex justify-between h-full">
+					<CarouselContent className="flex justify-between">
 						{
 							orderedCharacters.map((character) => {
 								return (users.filter((user) => user.characterId == character.id).map((user) => (

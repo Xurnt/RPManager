@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { IntegerUpdateOperation } from "@/data/operation";
+import { DiceState } from "@/data/roll";
+import { CurrentStatName, StatName } from "@/data/stats";
 import { socket } from "@/socket";
 import { DiceRollData, UpdateDiceStateRequest } from "@/sockets/dice";
+import { getRandomIntInclusive } from "@/utils/math";
 import { Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from "react";
 
 interface DiceProps{
@@ -10,21 +14,11 @@ interface DiceProps{
 	canInteract:boolean
 	id:number
 	setActiveDiceNumber:Dispatch<SetStateAction<number>>
-	activeDiceNumber:number
+	activeDiceNumber:number,
+	setCurrentDestiny:Dispatch<SetStateAction<number>>,
+	currentDestiny:number,
+	targetId:number
 }
-
-export enum DiceState {
-	TO_ROLL,
-	ROLLING,
-	ROLLED
-}
-
-function getRandomIntInclusive(min:number, max:number) {
-  const minCeiled = Math.ceil(min);
-  const maxFloored = Math.floor(max);
-  return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); // The maximum is inclusive and the minimum is inclusive
-}
-
 
 export function Dice({
 		maxValue,
@@ -33,10 +27,14 @@ export function Dice({
 		canInteract,
 		id,
 		activeDiceNumber,
-		setActiveDiceNumber
+		setActiveDiceNumber,
+		setCurrentDestiny,
+		currentDestiny,
+		targetId
 	}:DiceProps){
 		const [value, setValue] = useState<number>(maxValue)
 		const [diceState, setDiceState] = useState<DiceState>(DiceState.TO_ROLL)
+		const [currentDestinyCost, setCurrentDestinyCost] = useState<number>(1)
 		const rollInterval:RefObject<NodeJS.Timeout|null> = useRef(null)
 
 	const handleRoll = () => {
@@ -75,6 +73,25 @@ export function Dice({
 		}
 	})
 
+	const useDestinyPoints = () => {
+		setCurrentDestiny(currentDestiny - currentDestinyCost)
+		setCurrentDestinyCost(currentDestinyCost + 1)
+		socket.emit(
+			"updateStatsServer",
+			{
+				value:currentDestinyCost,
+				targets:[targetId],
+				currentStat: CurrentStatName.DESTINY,
+				stat: StatName.DESTINY,
+				type: IntegerUpdateOperation.REMOVE
+			}
+		)
+		setTotalRollValue(totalRollValue - value)
+		setValue(maxValue)
+		setDiceState(DiceState.TO_ROLL)
+		setActiveDiceNumber(activeDiceNumber + 1)
+	}
+
 	useEffect(() => {
 		if (diceState == DiceState.ROLLING) {
 			console.log("start anim")
@@ -94,7 +111,20 @@ export function Dice({
 				?
 					diceState == DiceState.ROLLED
 					?
+					<div className="flex flex-col gap-2">
 						<span>{value}</span>
+						{
+							currentDestiny >= currentDestinyCost
+							?
+								<Button
+									onClick={useDestinyPoints}
+									className="cursor-pointer bg-emerald-500 text-white-500 hover:bg-emerald-800 ">
+									{currentDestinyCost}
+								</Button>
+							:
+								null
+						}
+					</div>
 					:
 						<Button onClick={handleRoll} className="cursor-pointer">{value}</Button>
 				:

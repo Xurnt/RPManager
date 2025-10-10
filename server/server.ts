@@ -1,11 +1,7 @@
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-import { setupDiceHandlers } from "../sockets/dice.ts";
 import next from "next";
-import { setupInteractionHandlers } from "../sockets/interaction.ts";
-import { setupCharactersHandlers } from "../sockets/characters.ts";
-import { setupStatsHandlers } from "../sockets/stats.ts";
-import { setupUsersHandlers } from "../sockets/users.ts";
+import { setupSocketsHandlers } from "../sockets/socket.ts";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "0.0.0.0";
@@ -19,11 +15,7 @@ app.prepare().then(() => {
 	const httpServer = createServer(handler);
 
 	socketServer = new Server(httpServer);
-	setupDiceHandlers(socketServer);
-	setupInteractionHandlers(socketServer);
-	setupCharactersHandlers(socketServer);
-	setupStatsHandlers(socketServer);
-	setupUsersHandlers(socketServer);
+	setupSocketsHandlers(socketServer);
 	httpServer
 		.once("error", (err) => {
 			console.error(err);

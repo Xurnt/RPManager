@@ -28,7 +28,6 @@ export function CharacterComponent(
 
 	const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
-
 	return (
 		<div className="h-full">
 			<Dialog open={dialogOpen}>
@@ -69,9 +68,13 @@ export function CharacterComponent(
 							)
 						}
 						<div className="pb-4">
-							<h3 className="text-xl pb-4">Statistiques:</h3>
-							<div className="flex pl-4">
-								<div className="bg-card text-card-foreground rounded-xl border p-6 shadow-sm flex gap-4">
+							<div className="flex pb-4 gap-8">
+								<h3 className="text-xl flex-1 pr-12">Statistiques:</h3>
+								<h3 className="text-xl flex-1">Inventaire:</h3>
+								<div className="text-xl flex-1"/>
+							</div>
+							<div className="flex justify-start gap-8">
+								<div className="bg-card text-card-foreground rounded-xl border p-6 shadow-sm flex flex-1 gap-4 justify-around">
 									<div className="flex flex-col items-center">
 										<span className="pb-2">Vitalité: {character.vitality}</span>
 										<span className="pb-2">Mana: {character.mana}</span>
@@ -86,7 +89,14 @@ export function CharacterComponent(
 										<span className="pb-2">Savoir: {character.knowledge}</span>
 									</div>
 								</div>
+								<div className="flex-1">
+									<div className="bg-card text-card-foreground rounded-xl border p-6 shadow-sm flex gap-4">
+										<span className="pb-2">{character.inventory}</span>
+									</div>
+								</div>
+	
 								<div className="flex-1" />
+
 							</div>
 						</div>
 						<div>
