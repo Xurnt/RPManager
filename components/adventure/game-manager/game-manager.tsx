@@ -35,7 +35,7 @@ export function GameManager(
 				userData == null 
 				?
 					<>
-						<h1 className="text-3xl text-center pb-5">Aller connecte toi</h1>
+						<h1 className="text-3xl text-center pb-5">Aller connectes toi</h1>
 						<p className="">Stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp stp</p>
 					</>
 				:
@@ -53,14 +53,20 @@ export function GameManager(
 							characters={characters}
 						/>
 					:
-						<PlayerView
-							rollData={rollData}
-							setRollData={setRollData}
-							userData={userData}
-							interactionTargets={interactionTargets}
-							setInteractionTargets={setInteractionTargets}
-							characters={characters}
-						/>
+							gameSession.isActive
+							?
+								<PlayerView
+									rollData={rollData}
+									setRollData={setRollData}
+									userData={userData}
+									interactionTargets={interactionTargets}
+									setInteractionTargets={setInteractionTargets}
+									characters={characters}
+								/>
+							:
+							<div className="h-full flex justify-center items-center">
+								<h1 className="font-bold text-xl">Session de jeu inactive, attendez votre cher DM :3</h1>
+							</div>
 			}
 		</Card>
 	)

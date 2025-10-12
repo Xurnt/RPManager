@@ -108,14 +108,14 @@ export function setupDiceHandlers(io: Server, socket: Socket) {
 				responseData.push(responseDataBody);
 				diceRollId++;
 			}
-			io.sockets.emit("createRollClient", responseData);
+			io.emit("createRollClient", responseData);
 		}
 	});
 
 	socket.on(
 		"updateDiceStateServer",
 		(updateStateRequest: UpdateDiceStateRequest) => {
-			io.sockets.emit("updateDiceStateClient", updateStateRequest);
+			io.emit("updateDiceStateClient", updateStateRequest);
 		}
 	);
 

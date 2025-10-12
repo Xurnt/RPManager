@@ -1,4 +1,5 @@
 import { Class, ClassCategory } from "@prisma/client";
+import { Card } from "../ui/card";
 
 interface CharacterClassProps {
 	classes:Class[]
@@ -17,10 +18,10 @@ export function CharacterClass({classes, category}:CharacterClassProps): React.R
 			<div className="m-20">
 				{
 					classes.map((characterClass:Class) => (
-						<div key={"characterClass" + characterClass.id.toString()} className="mt-10 mb-10">
+						<Card key={"characterClass" + characterClass.id.toString()} className="my-10 px-8">
 							<h3 className="scroll-m-20 text-left text-xl font-bold  tracking-tight text-balance">{characterClass.name}</h3>
 							<p>{characterClass.description}</p>
-						</div>
+						</Card>
 					))
 				}
 			</div>

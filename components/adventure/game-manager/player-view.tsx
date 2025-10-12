@@ -37,7 +37,7 @@ export function PlayerView({
 		setInteractionTargets(characters.filter((character) => data.map((dataItem) => dataItem.target).includes(character.id)))
 	})
 
-	socket.on("stopInteraction", () => {
+	socket.on("stopInteractionClient", () => {
 		setPlayerView(PlayerViews.Main)
 	})
 

@@ -4,7 +4,7 @@ import { prisma } from "../server/prisma";
 export function setupCharactersHandlers(io: Server, socket: Socket) {
 	socket.on("getCharactersServer", async () => {
 		const characters = await prisma.character.findMany();
-		io.sockets.emit("getCharactersClient", characters);
+		io.emit("getCharactersClient", characters);
 	});
 
 	socket.on("setCharacterSelectabilityServer", async (value: boolean) => {

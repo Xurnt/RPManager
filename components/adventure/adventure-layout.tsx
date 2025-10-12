@@ -54,8 +54,9 @@ export function AdventureLayout(
 			const currentCharacterIndex:number = tempCharacters.findIndex((character) => character.id == userData.characterId)
 			if (currentCharacterIndex!=-1) {
 				const currentCharacter = tempCharacters[currentCharacterIndex]
+				const currentCharacterNewIndex = tempCharacters.length == 5 ? 2 : tempCharacters.length > 5 ? 0 : 1
 				tempCharacters.splice(currentCharacterIndex, 1)
-				tempCharacters.splice(1,0,currentCharacter)
+				tempCharacters.splice(currentCharacterNewIndex,0,currentCharacter)
 			}
 		}
 		setOrderedCharacters(tempCharacters)

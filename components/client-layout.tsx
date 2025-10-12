@@ -118,10 +118,6 @@ export function ClientLayout(
 		console.log("UPDATE GAME SESSION")
 		setGameSessionState(data)
 	})
-
-	socket.on("updateStatsClient", () => {
-		socket.emit("getCharactersServer")
-	})
 	
 	socket.on("selectCharacterClient", () => {
 		console.log("SELECT CHARACTER")

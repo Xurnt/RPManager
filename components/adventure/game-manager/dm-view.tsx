@@ -87,7 +87,7 @@ export function DmView(
 		setNewInteraction(status)
 		if (!status) {
 			setInteractionTargets([])
-			socket.emit("stopInteraction")
+			socket.emit("stopInteractionServer")
 		}
 	}
 	const removeInteractionTarget = (targetId:number) => {

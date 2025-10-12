@@ -1,0 +1,558 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 17.2
+-- Dumped by pg_dump version 17.1
+
+-- Started on 2025-10-12 14:20:10
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+DROP DATABASE "RP";
+--
+-- TOC entry 4849 (class 1262 OID 16528)
+-- Name: RP; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE "RP" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'French_France.1252';
+
+
+ALTER DATABASE "RP" OWNER TO postgres;
+
+\connect "RP"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 217 (class 1259 OID 16529)
+-- Name: Character; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Character" (
+    id integer NOT NULL,
+    name text NOT NULL,
+    title text NOT NULL,
+    age integer NOT NULL,
+    "mainClassId" integer NOT NULL,
+    "secondClassId" integer,
+    vitality integer NOT NULL,
+    mana integer NOT NULL,
+    strength integer NOT NULL,
+    dexterity integer NOT NULL,
+    courage integer NOT NULL,
+    charisma integer NOT NULL,
+    perception integer NOT NULL,
+    discretion integer NOT NULL,
+    knowledge integer NOT NULL,
+    destiny integer NOT NULL,
+    "publicStory" text NOT NULL,
+    "privateStory" text NOT NULL,
+    motivations text NOT NULL,
+    fears text NOT NULL,
+    "like" text NOT NULL,
+    dislike text NOT NULL,
+    "talentName" text NOT NULL,
+    "weaknessName" text NOT NULL,
+    inventory text NOT NULL,
+    "talentDescription" text NOT NULL,
+    "weaknessDescription" text NOT NULL,
+    "picturePath" text NOT NULL,
+    "currentVitality" integer NOT NULL,
+    "currentMana" integer NOT NULL,
+    corruption integer DEFAULT 100 NOT NULL,
+    selectable boolean DEFAULT false NOT NULL,
+    "currentCorruption" integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public."Character" OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 16546)
+-- Name: Class; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."Class" (
+    id integer NOT NULL,
+    name text NOT NULL,
+    "classCategoryId" integer NOT NULL,
+    description text NOT NULL
+);
+
+
+ALTER TABLE public."Class" OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 16553)
+-- Name: ClassCategory; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."ClassCategory" (
+    id integer NOT NULL,
+    name text NOT NULL,
+    description text NOT NULL
+);
+
+
+ALTER TABLE public."ClassCategory" OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 16609)
+-- Name: GameSession; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."GameSession" (
+    "isActive" boolean NOT NULL,
+    "isCharacterSelectionAllowed" boolean NOT NULL,
+    id integer NOT NULL
+);
+
+
+ALTER TABLE public."GameSession" OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 16646)
+-- Name: TextDisplay; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."TextDisplay" (
+    id integer NOT NULL,
+    title text,
+    core text
+);
+
+
+ALTER TABLE public."TextDisplay" OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 16580)
+-- Name: User; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."User" (
+    id integer NOT NULL,
+    name text NOT NULL,
+    password text NOT NULL,
+    "roleId" integer NOT NULL,
+    "characterId" integer,
+    "isConnected" boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public."User" OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 16587)
+-- Name: UserRole; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public."UserRole" (
+    id integer NOT NULL,
+    role text NOT NULL
+);
+
+
+ALTER TABLE public."UserRole" OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 16625)
+-- Name: User_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public."User" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public."User_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 4836 (class 0 OID 16529)
+-- Dependencies: 217
+-- Data for Name: Character; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public."Character" (id, name, title, age, "mainClassId", "secondClassId", vitality, mana, strength, dexterity, courage, charisma, perception, discretion, knowledge, destiny, "publicStory", "privateStory", motivations, fears, "like", dislike, "talentName", "weaknessName", inventory, "talentDescription", "weaknessDescription", "picturePath", "currentVitality", "currentMana", corruption, selectable, "currentCorruption") VALUES (3, 'Rufus', 'Bienfaiteur des égarés', 55, 8, NULL, 50, 50, 60, 40, 70, 80, 20, 30, 50, 0, '    Le royaume de Syphania est régulièrement cité comme étant l''état le plus prospère de tous les temps. Malgré tout, les stigmates du passé sont encore visible. Une partie de la population vit dans la pauvreté, luttant jour après jour pour gagner son pain. Carastelle est moins exposé à cette misère que d''autres villes du royaume, et ce grâce à son économie florissante. Au contraire, la petit ville de Bamitol subit de plein fouet ce phénomène.
+    LINEBREAK
+    Bamitol est une ancienne cité agricole qui fut ravagée par la guerre contre Zelox. Ces terres désormais corrompues peinent à faire pousser quoi que ce soir. De nombreux exploitants se sont exilés en quête de terre fertiles, d''autre ont dû se reconvertir. Une grande partie de la population peine à survivre. Heureusement, le grand pêcheur est là. 
+	LINEBREAK
+	Le "grand pêcheur" est la déité locale. On le décrit comme ayant un corps d''homme et une tête de poisson. Armé de sa canne à pêche, il ferre tout ce qui influence la vie d''un humain. Ce serait lui qui extrait l''âme du bambin de sa mère, lui qui sors des terres les légumes, lui qui tire le futur de sa canne d''argent. Son représentant dans ce monde est le père Rufus. Celui-ci prêche sa bonne parole et organise régulièrement des cérémonies pour prier la bonne pêche. Il fut sélectionné par le roi Dragoliub pour la mission en tant que représentant des dieux: en effet, la bénédiction du grand pêcheur serait un atout indéniable.', 'Le destin est parfois farceur. Rufus était autrefois un jeune agriculteur qui comptait reprendre la ferme de son père. Un terrible jour d''été, l''armée de Zelox parvint aux portes de Bamitol. Elle ravagea la ferme familiale et emporta ses parents. Cependant, ces catastrophes soudaines n''étaient pas suffisantes pour abattre Rufus. Au contraire, elles alimentaient sa rage de vivre. Et plus que tout, elles confirmaient pour lui que si les dieux existaient, ils étaient au mieux indifférents au sort des humains, et au pire cruels. 
+  LINEBREAK
+  Rufus décida de tourner en ridicule ces dieux pathétiques qui avaient abandonnés le peuple. Il inventa sa propre déité : un homme à tête de poisson. Qu''est ce qui pouvait être plus ridicule que cela ? Il affirma à plusieurs personnes qu''il avait eu une prémonition de cette créature, qu''elle l''avait choisi ! Personne ne le croyait, mais personne n''osait le moquer. Aussi peu probable que fût l''existence de ce "grand pêcheur", le risque d''offenser un dieu n''en valait pas le coup. Rufus se complaisant de cette peur, riant intérieurement à la vue de ces idiots trop couards pour rire d''une créature imaginaire.
+  LINEBREAK
+  
+  Petit à petit, des événements positifs avaient lieu dans les alentours du village. Rien de surnaturel ou de particulièrement improbable. Mais les plus superstitieux voyaient une corrélation évidente entre ces événements et les prétendues prémonitions de Rufus. Les rumeurs se rependaient et, au bout de quelque mois, Rufus se retrouva a la tête d''une congrégation de 10 personnes. Il vit en eux une opportunité en or: les croyants étaient prêts à tout pour leur dieux. Il parti quelques mois étudier la psychomancie à l''académie de Carastelle, convaincu que cet outil lui permettrait plus facilement d''agrandir son culte.
+  LINEBREAK
+  
+  Rufus méprisait ses fidèles. Ils étaient tous aussi idiots les un que les autres, à croire en ses prophéties douteuses. Cependant, après des années de "règne", son regard sur eux évolua. Il pensait toujours qu''ils étaient tous des demeurés finis, mais commençait à avoir de l''affection pour eux. Si personne n''était là pour guider ces abrutis, qui savait ce qui pourrait leur arriver? Rufus décida alors d''utiliser son influence pour les guider vers un futur plus prospère, même s''il fallait passer par des voies non officielles…
+  LINEBREAK
+  
+  Au bout d''une dizaine d''années, le culte du grand pêcheur s''était répandu à l''ensemble de Syphania. Ce n''était pas la religion dominante, loin de là. En revanche, c''était la plus riche. Rufus utilisait ses fidèles pour organiser un marché noir parallèle, marché qui permettait à Bamitol de survivre malgré le peu de perspective. Cette religion était devenu une véritable mafia, et Rufus en était le parrain. Leurs activités, bien qu''illégales, étaient rarement immorales. Ils se contentaient principalement d''ignorer certaines procédures… Menacer quelques personnes bien placées… Obtenir des informations compromettantes… 
+  LINEBREAK
+  
+  La royauté de Syphania avait décider d''ignorer ces activités. Après tout, à l''heure actuelle, Rufus n''avait pas montré la moindre intention négative envers le gouvernement. Tant que ses activités ne portaient pas atteinte aux habitants, ils le laissait faire. Ils le voyaient comme un baron local non officiel. C''est également la raison pour laquelle Rufus fut invité à participer à la mission: il s''agissait d''une porte ouverte à une collaboration plus active. ', 'Légitimer son contrôle de Bamitol, obtenir plus d''influence et de moyens', 'La disparition de la foi de ses fidèles/révélation de la supercherie du grand pêcheur ', 'La bière, la pétanque, les cigares ', 'Les gens crédules, les religions', 'Guide des petites gens', 'Valeurs contradictoires', 'Livre de prière, 5 cigares', 'Rufus gagne un bonus de 20 sur tous ses jets de dé en rapport avec la manipulation. Ce bonus passe à 40 si la cible est un adepte du culte du grand pêcheur', 'Rufus est un homme pragmatique qui déteste les personnes qu''il considère comme trop naïves. Ainsi, s''il apprend qu''on lui a menti ou qu''on l''a manipulé, il commence à se haïr soi même: il perd jusqu''à 2 points de destin et subit un malus de 30 sur son prochain jet de dé
+', '/Rufus', 50, 50, 100, false, 0);
+INSERT INTO public."Character" (id, name, title, age, "mainClassId", "secondClassId", vitality, mana, strength, dexterity, courage, charisma, perception, discretion, knowledge, destiny, "publicStory", "privateStory", motivations, fears, "like", dislike, "talentName", "weaknessName", inventory, "talentDescription", "weaknessDescription", "picturePath", "currentVitality", "currentMana", corruption, selectable, "currentCorruption") VALUES (6, 'Percy', 'Gamin des rues', 11, 5, NULL, 50, 70, 20, 70, 30, 40, 70, 80, 20, 0, '	Les récits des bardes décrivent souvent Syphania comme un havre de paix et de prospérité, et pour de bonnes raisons: la grande majorité de la population vie dans des conditions confortable et meurt de vieillesse. Cependant, comme dans tous royaumes, il existait des exceptions. Des parias. Ceux qui ne jouissaient pas du luxe de dormir sous un toit, et volaient pour survivre.
+	LINEBREAK
+	Parmi ceux là, un être s''était forgé une réputation particulière: un voleur inconnu de tous qui ne s''était jamais fais prendre. Un as de la discrétion qui, selon les rumeurs, utilisait l''élémancie de télékinésie pour distraire ses cibles et les dépouiller à distance
+	LINEBREAK
+	Lorsque la troupe d''aventurier formée par le roi arriva aux abords de Bois-Menu, il firent une rencontre inattendue: un jeune enfant du nom de Percy, prétendant être ce mystérieux voleur. Il leur présenta des objets qu''il leur avait discrètement subtilisé pour les convaincre, et négocia une place dans leur équipe contre leurs possession. Le groupe accepta, voyant en ce jeune enfant un éventail de compétences pouvant être utile à leurs missions.', 'Les parents de Percy étaient des diplomates réputés, œuvrant à établir des accords commerciaux avec les états voisins. Malheureusement, le destin s''acharna sur eux. La mère succomba de la maladie peu après la naissance de Percy. Le père, fou de chagrin, dilapida sa fortune dans l''alcool et le jeu. Il fut contraint d''emprunter à des personnes peu recommandable, dont Jack Marteleau. Celui-ci était un usurier connu pour les traitements brutaux qu''il infligeait à ceux qui ne pouvaient le rembourser. Quelques jours après l''échéance de son remboursement, le père de Percy disparu. Celui-ci n''était pas dupe: il connaissait les rumeurs et savait que Jack était la cause directe ou indirecte de cette absence. Il savait également que son père n''était probablement plus en vie.
+	LINEBREAK
+	Quelques semaines après ces évènements, il fit la rencontre d''un vieillard muet.  Celui-ci prit le jeune enfant sous son aile et lui appris l''élémancie de télékinésie. Tout aussi pauvre et affamé que Percy, il lui montra comment survivre en ce bas monde. Leurs coopération dura quelques mois, jusqu''au jour ou le vieil homme fut pris la main dans le sac. 
+	LINEBREAK
+	La perte d''un être cher supplémentaire rendit Percy fou de rage. Il comprit une fois de plus que seuls les rapports de forces comptaient. Que les puissants pouvaient se permettre de vivre en exploitant la misère des autres, et les punissaient même s''ils daignaient tenter de survivre à leur manière. Que les riches s''engraissaient en taxant les pauvres toujours plus, les considérant comme des moins que rien. Que les "castes supérieures" se fichaient bien du sort du peuple: seule comptait sa passivité et soumission. Percy décida de ce battre contre ce système corrompu, renonçant à toute forme de morale pour faire payer ces chiens.
+	LINEBREAK
+	Le lendemain matin, un spectacle lugubre était disponible sur la place principale de Carastelle: les figures calcinées de deux hommes virevoltaient en l''air, dansant au dessus d''une foule horrifiée. Ces individus furent identifiés comme étant Jack Marteleau et un des chefs de la garde responsable de la surveillance des marchés.', 'Augmenter son influence pour renverser le système', 'La dette, la faim', 'Le pain, les légumes frais, les personnes âgées', 'Les riches, l''hiver', 'Apparence innocente', 'Pulsions rancunières', 'Paire de dagues, sac en toile', 'Lorsque Percy échoue un jet de discrétion, le MJ doit lancer un dé 100. Si celui ci est au dessus de 50(inclus), les personnes aux alentours vont remarquer l''action que Percy a effectué mais n''identifieront pas qu''il en est l''auteur.', 'Lorsque Percy se sent lésé par quelqu''un, il obtient le malus **Pulsion rancunière** (attribué par le MJ). Tant que Percy ne s''est pas vengé sur cette personne d''une manière ou d''une autre, il subit un malus de -20 sur tous ses jets de dés
+', '/Percy', 50, 70, 100, true, 0);
+INSERT INTO public."Character" (id, name, title, age, "mainClassId", "secondClassId", vitality, mana, strength, dexterity, courage, charisma, perception, discretion, knowledge, destiny, "publicStory", "privateStory", motivations, fears, "like", dislike, "talentName", "weaknessName", inventory, "talentDescription", "weaknessDescription", "picturePath", "currentVitality", "currentMana", corruption, selectable, "currentCorruption") VALUES (5, 'Claudius', 'Minéral solide', 424, 3, NULL, 80, 60, 70, 20, 50, 50, 30, 30, 60, 0, 'Le monde de Fellam était fait de créatures plus étranges les unes que les autres. Parmi celles-ci, on pouvait compter le cas de Claudius, une pierre vivante. On raconte que ce minéral a traversé les âges, et il est à ce jour le plus vieil être connu. Il profite d''une vie paisible dans la ville minière de Courneuve, où il supervise les travaux d''extraction à ses heures perdues.
+	LINEBREAK
+	Il a acquit la réputation d''être fiable bien que légèrement orgueilleux. Il ne le montrait pas ouvertement, mais on pouvait déceler dans ses propos un soupçon de suffisance. Il semblait clair qu''il se sentait supérieur aux humains. Et factuellement il l''était, du moins sur l''aspect physique. Nul ne pouvait nier la solidité et puissance de son corps, bien plus résistant qu''un humain sans aide magique.
+	LINEBREAK
+	Sergeï Dragoliub fit appel à lui pour la mission de recherche de Theoryn. Si le danger mentionné était réel, une créature extraordinaire comme Claudius serait certainement un atout de choix.', 'Jadis, Claudius était un jeune enfant passionné par les minéraux. Leur beauté attirait son regard et occupait ses pensées en permanence, virant à l''obsession. Ce comportement étrange n''était pas compris par ces camarades, qui voyaient en cette différence une opportunité d''exclure l''enfant. Durant des années, Claudius subit les moqueries, coups et autre insultes des enfants de son âge. Chaque soir, il parlait à ses pierres, rêvant de pouvoir entretenir une vraie conversation avec elles.
+	LINEBREAK
+	Un jour, il apprit la découverte d''une nouvelle manière révolutionnaire d''exploiter la biomancie: l''invocation. Il fallait contrôler son énergie vitale et en transmettre une partie à un élément inerte, et celui-ci prenait vie! Excité à l''idée d''enfin pouvoir s''entretenir avec ses pierres, il s''exerça tous les soirs au contrôle de son énergie, et tentait régulièrement de la transmettre à un cristal de sel. Son premier succès eu lieu au bout de quelques semaines. Claudius était fou de joie! Pour la première fois de sa vie, il avait un ami.
+	LINEBREAK
+	Le cristal de sel, surnommé Sali, n''était pas très loquace. Il écoutait les complaintes de Claudius tout en hochant la "tête" , mais ses contributions aux dialogues s''arrêtaient là. Jour après jour, il exerça sa biomancie pour transmettre de plus en plus d''énergie à Sali, ce qui semblait le rendre de plus en plus énergique et sociable. Chaque soir après sa discussion, Claudius reprenait l''énergie de Sali, en attendant impatiemment leur prochaine conversation le lendemain.
+	LINEBREAK
+	Arrivé à l''âge adulte, l''obsession de Claudius pour les pierres n''avait pas diminué, au contraire. Il devint mineur pour passer plus de temps en compagnie de ses minéraux adorés. Lors d''une excursion particulièrement longue, il tomba sur une caverne d''une beauté incroyable: Celle-ci était couverte de géodes d''améthyste et d''obsidienne. Fasciné par cette vision, Claudius voulu faire de ces minéraux son invocation la plus réussie à ce jour. Il concentra la quasi totalité de son énergie et la transmit à l''une des parois. Ce transfert énergivore laissa Claudius dans un état de fatigue extrême, et il s''évanouit aussitôt.
+	LINEBREAK
+	La créature commença à se former. Elle prit une forme vaguement humaine, bien plus large et dense. En s''extrayant du mur, elle entendit un bruit de craquement sourd. Un regard sous ses pieds remplit son âme d''horreur. Ci-dessous, on pouvait voir le corps sans vie de Claudius, écrabouillé sous le poids du minéral qui venait de naître. Le tas de pierre resta de longues heures à ses cotés, pleurant sans larmes. Au bout de plusieurs jours, il décida de prendre le nom de Claudius en hommage à son créateur. Après tout, l''énergie qui l''habitait était celle de Claudius, et même s''il n''était pas réellement la même personne, il avait accès à chacun de ses souvenirs.
+	LINEBREAK
+	S''exposant au monde, il fut la source de nombreuses interrogations. Après tout, il était la première invocation capable de vivre sans maitre. De nombreux érudits cherchèrent à l''étudier, ce qui ennuyait grandement Claudius. Quelques os brisés suffirent à faire passer le message: il n''était pas un simple cobaye pour les humains, ces mêmes humains qui jadis battaient et humiliaient son créateur. Non, il était le fruit de longues années de travail et de passion, et il comptait bien honorer son maitre en ayant une existence valant le coup d''être vécue.', 'Assurer la protection de Courneuve, honorer son créateur', 'Etre capturé et étudié', 'Les minéraux, les animaux', 'Les humains arrogants, l''eau', 'Corps solide', 'Sentiment de supériorité', 'Vide', 'Claudius subit -20 dégâts des attaques physiques', 'Claudius se sent supérieur aux humains. Lorsqu''il échoue un jet de caractéristique physique (force, dextérité, réflexe), il doit se rassurer sur ses capacités. Il a le choix entre: LINEBREAK
+	- Blâmer les autres membres du groupe => Les cibles du prochain jet de dé subissent un malus de -15
+	LINEBREAK
+	- Admettre son échec => Perd jusqu''à 20 points de mana (option uniquement disponible si Claudius a des points de mana)
+	LINEBREAK
+	- Blâmer un manque de chance => Claudius lance un dé 100. si le résultat est inférieur à 50 (inclus), il perd 2 points de destin. Sinon, il n''en perd pas. (option uniquement disponible si Claudius a 2 points de destin)
+', '/Claudius', 80, 60, 100, false, 0);
+INSERT INTO public."Character" (id, name, title, age, "mainClassId", "secondClassId", vitality, mana, strength, dexterity, courage, charisma, perception, discretion, knowledge, destiny, "publicStory", "privateStory", motivations, fears, "like", dislike, "talentName", "weaknessName", inventory, "talentDescription", "weaknessDescription", "picturePath", "currentVitality", "currentMana", corruption, selectable, "currentCorruption") VALUES (7, 'Salomon', 'Alchimiste personnel du roi', 78, 4, NULL, 40, 70, 30, 40, 20, 60, 50, 60, 80, 0, '	Parler du monde de Fellam sans parler de magie est un non sens absolu, tant ces deux sont  intrinsèquement liés.  Nombres de grand mages marquèrent l''histoire de par leurs capacités, exploits et découvertes. Le peuple Syphanien était tout particulièrement intéressé par cette énergie et fut l''un des premiers à le traiter comme une science à étudier. C''est ainsi que de nombreuses académies virent le jour, permettant aux érudits d''effectuer leurs recherches et aux néophytes d''apprendre à maitriser cet art sous la tutelle de leurs ainés.
+	LINEBREAK
+	
+	La plus prestigieuse de ces académies était sans nul doute l''académie de Carastelle. Celle-ci accueillait des centaines d''étudiants et tout autant de chercheurs. Elle fut le berceau de découvertes fondamentales au cours de ses centaines d''années d''existences et est encore aujourd''hui le symbole de la curiosité insatiable de l''être humain.
+	LINEBREAK
+	
+	Le directeur actuel de l''académie était un prodige de l''alchimie nommé Salomon Zoraster.  Il était régulièrement convoqué par le roi en personne pour des requêtes personnelles, et jamais il ne faillit à ses missions. Comme le disait le dicton, "le savoir est le pouvoir", et Sergeï Dragoliub en était bien conscient. C''est pourquoi il vit en lui un élément indispensable pour cette mission, capable de renseigner ses coéquipiers grâce à ses connaissances encyclopédique et d''investiguer cette affaire avec une rigueur scientifique.', 'La recherche scientifique est une discipline ardue, longue et peu gratifiante. Rares sont ceux qui ont eu le privilège de découvrir de nouvelles propriétés de la magie. Et parmi ces privilégiés, on retrouvait une caractéristique commune. Les néophytes pourraient penser qu''il s''agisse de la rigueur, de la persévérance ou de la créativité. Certes, chacune de ses paramètres étaient importants à leurs manière, mais il en est un qui est indispensable: la chance. Et Salomon ne le savait que trop bien…
+	LINEBREAK
+	Salomon était originaire d''une petite famille de boulangers sans prétention. Chez les Zoraster, devenir boulanger était une tradition, et toute autre alternative étaient rapidement rejetée. Malheureusement, cela ne convenait pas à Salomon: il souhaitait avoir un grand destin, semblable aux mythes et légendes de son enfance. Le jour de ses 20 ans, il quitta le domicile familial pour se rendre à Carastelle. Ses parents, furieux de le voir abandonner ainsi sa famille et son histoire, le renièrent.
+	LINEBREAK
+	
+	Arrivé dans la capitale, il s''inscrit à l''académie pour y apprendre l''élémancie de télékinésie. Il avait en tête les images de grands mages mobilisant des torrents de flammes et des tempêtes d''éclair sur ces ennemis. La réalité le rattrapa bien assez tôt: le simple fait de faire léviter une goute d''eau était une épreuve pour lui. En revanche, il pris goût en l''élémancie de transmutation, et décida de se concentrer pleinement sur cette discipline. Ses difficultés n''avaient pas disparu pour autant. Sa famille étant très modeste, il n''avait jamais accédé à une éducation formelle., et ses lacunes le ralentissaient bien trop à son goût. Malgré tout, il arriva à terminer ses études et devint un chercheur à l''âge de 34 ans.
+	LINEBREAK
+	
+	Un jour, un de ses partenaire de recherche, Bibus Moribond, fit une découverte révolutionnaire. Il demanda l''aide de Salomon en qui il faisait complètement confiance pour revérifier ses résultats et calculs. Le soir même, Salomon et Bibus festoyèrent dans une taverne locale. Enhardi par la boisson, Bibus prit à parti un groupe de loubard qui, selon lui, ne l''avait pas respecté. S''en suivit une bagarre dont Bibus, victime d''une mauvaise chute, ne ressorti pas vivant.
+	LINEBREAK
+	
+	Le lendemain,  Salomon présenta les résultats de Bibus au reste des académiciens en les faisant passer pour ses recherches. Certes, cela n''était pas honnête, et Bibus était un ami proche, mais qui le saurait? "Il s''agit d''un crime sans victime", se persuadait-il. Ses recherches firent grimper la notoriété de Salomon, ce qui lui donna un accès plus aisé à du meilleur matériel et de meilleures ressources. Ce ne fut pas la seule fois où Salomon profita de la disparition de chercheurs pour s''accaparer leurs travaux. Et malgré ce à quoi on pourrait s''attendre, il n''en était jamais l''initiateur. Non, cet homme disposait simplement d''une chance incroyable, peut-être même surnaturelle. Lui même ne l''expliquait pas. A son âge maintenant avancé, Salomon avait acquis la reconnaissance dont il rêvait. Cependant, la culpabilité l''assaillait en permanence. Il n''était pas un mauvais élémancien, loin de là: en revanche, il était loin d''être le génie omniscient que le monde voyait en lui.', 'Accomplir quelque chose d''important par lui même', 'Que le monde découvre qu''il n''est qu''une fraude', 'La recherche, les alcools forts', 'Le pain, la nuit', 'Chance improbable', 'Culpabilité nocturne', 'Canne, bloc-notes, plume et encre', 'Les réussites critiques se déclenchent au dessus de 75', 'Salomon sent le poids de son imposture plus intensément aux heures tardives. L''ensemble de ses jets subissent un malus de -15 de 18h à 06h', '/Salomon', 40, 70, 100, false, 0);
+INSERT INTO public."Character" (id, name, title, age, "mainClassId", "secondClassId", vitality, mana, strength, dexterity, courage, charisma, perception, discretion, knowledge, destiny, "publicStory", "privateStory", motivations, fears, "like", dislike, "talentName", "weaknessName", inventory, "talentDescription", "weaknessDescription", "picturePath", "currentVitality", "currentMana", corruption, selectable, "currentCorruption") VALUES (4, '???', 'Le spectre de Pouillastruc', -1, 7, NULL, 60, 80, 60, 50, 50, 20, 70, 30, 30, 0, '	La cité flottante de Pouillastruc est souvent citée comme étant l''un des points mercantile les plus important du royaume de Syphania. Bon nombre de marchants sont prêt à payer des fortunes pour y exercer leur activité, et ces investissements sont souvent fructueux. Par conséquent, la ville applique un code strict pour éviter l''apparition massive d''arnaqueurs. La réputation de la cité est capitale pour sa prospérité, et le duc en charge de la région l''a bien compris. Ainsi, la garde y est bien plus active et vigilante. Malgré tous ces moyens, un être particulièrement doué parvient régulièrement à échapper à l''attention des gardes.
+	LINEBREAK
+	Ce marchand mystérieux a acquis une réputation particulièrement négative. On raconte qu''acheter un objet chez celui-ci est l''une des pire erreur qu''un client peut faire. En effet, tous les objets qu''il vend ne sont qu''illusions. La malheureuse victime ne se rend compte qu''elle a échangé des pièces bien réelles contre une chimère bien après la disparition du marchand. Les rumeurs sur cet arnaqueur vont bon train, et se contredisent entre elles. Certains parlent d''un vieillard dans une ruelle reculée. D''autres d''une jeune femme jouant de ses charmes pour attirer la clientèle. Cependant, tous s''accordent à dire que cette entité existe bel et bien et est l''unique responsable de ce type de supercherie. Ses multiples méfaits ont forgé sa réputation, créant la légende de celui qu''on appelle désormais "Le spectre de Pouillastruc"
+	LINEBREAK
+	Le roi Dragoliub contacta Ladiva Sernoz, capitaine de la garde de Pouillastruc, à joindre la troupe d''aventuriers. Celle-ci se présenta devant lui et accepta cette requête. Cependant, plusieurs jours après le départ, les aventuriers firent face à une surprise inattendue. Au réveil, Ladiva avait disparu. A sa place se trouvait une forme encapuchonnée, qui se présenta comme étant le fameux "spectre de Pouillastruc". Les aventuriers, après quelques temps de délibération, décidèrent d''accorder leur confiance en ce visiteur inattendu. Après tout, il avait déjà eu de multiples occasions de les attaquer lorsqu''il adoptait l''identité de Ladiva. En revanche, quelles pouvaient bien être ses motivations?', 'Il y a quelques années, dans un autre monde que celui-ci, un homme fit un pacte ignoble pour sauver sa peau. Ce lâche, nommé Ludolphe, offrit l''enveloppe corporelle de ses amis les plus chers à une créature supérieure. En échange, il obtint le contrôle total de leurs âme, qu''il plaça dans un corps de chien. Cet humain perfide continua de collaborer avec la monstruosité, lui offrant maintes vies en échanges de faveurs toujours plus grandiloquentes. Pouvoir, richesse, célébrité… Il avait tout ce que l''on pouvait vouloir, et plus encore. Cette avidité sans limite fut cependant le déclencheur de sa déchéance. En effet, le monde qui l''avait hébergé était désormais méconnaissable, et les humains se faisaient de plus en plus rare. La faim de l''être supérieur, elle, ne tarissait pas. Rapidement, la relation que Ludolphe entretenait avec la créature évolua, passant de proches collaborateur à de simples connaissances, jusqu''à devenir un chasseur et une proie. Un jour fatidique, Ludolphe et son "chien" furent complètement encerclé par la créature supérieure. Sentant la fin de ses jours arriver, Ludolphe pria et utilisa les pouvoirs qu''il avait acquit pour tenter de sauver ses anciens partenaires. Et contre toute attente, il parvint à ses fins, projetant se chien à travers les univers pour arriver dans  le monde de Fellam. A t''il réussit cet exploit par sa seule volonté, couplée à ses nouveaux vils pouvoirs? Un être supérieur a t''il prit pitié de lui? Nul ne le sait.  En revanche, une chose était sûre: sa tentative de rédemption n''allait pas l''épargner d''une éternité de souffrance.
+	LINEBREAK
+	Ce chien errant fut découvert gisant contre un arbre par Marcus Rondepointe, un psychomancien reconnu de l''académie de Carastelle. Pris d''affection pour celui-ci, il entreprit de communiquer avec son esprit. Quel ne fut pas sa surprise de découvrir que l''esprit de ce pauvre animal n''était pas simplement celui d''un chien commun, mais un agrégat d''âmes fusionnées. La curiosité scientifique de Marcus Rondepointe fut piquée et il décida de recueillir cet animal, qu''il nomma Clebopatre. Après de longues conversations mentales avec lui, et sous sa demande, il l''envoya étudier à l''académie de Carastelle. Les multiples esprits qui abritaient son corps permettait à ce toutou d''utiliser une quantité de mana phénoménale, bien supérieure à celle de ses camarades. Ses talents n''étaient cependant pas bien vu par tous. Nombreux étaient ceux qui jalousaient ses capacités, vexés d''être moins compétents qu''un canidé. Il fut ainsi la cible de nombreuses attaques plus ou moins virulentes. C''est pourquoi Clebopatre décida d''apprendre la psychomancie d''illusion, une forme de magie qui lui permettrait de ne plus être jugé par son apparence.
+	LINEBREAK
+	Ses nombreuses expériences négative avaient fait de Clebopatre un chien qui méprise les humains. Le seul homme qu''il respectait était Marcus Rondepointe, celui qui l''avait recueilli et avait vu son potentiel. Malheureusement, celui-ci tomba gravement malade, ce qui l''empêcha de poursuivre ses recherches. Il avait dilapidé ses économies dans les frais d''éducation de Clebopatre, et n''avait donc plus les moyens de s''offrir les services d''un biomancien compétent. Ce fut ce besoin d''argent qui mena Clebopatre à arnaquer les clients de la cité de Pouillastruc. Après tout, il n''avait aucun respect envers eux, et donc aucun scrupule à les manipuler et voler. Il vit en cette maladie un moyen de justifier son existence en ce monde: il n''avait pas pardonné à son tortionnaire originel, mais il était heureux d''être encore en vie pour aider un être vraiment bon. Un jour, il intercepta une lettre du roi Dragoliub, demandant à voir Ladiva Sernoz pour une mission urgente. Il vit en cette mission l''opportunité de se faire connaitre, accepter, et par dessus tout sécuriser les services d''un biomancien pour le reste de la vie de Marcus.  C''est ainsi qu''il se dirigea vers Carastelle, la cité qui l''avait accueilli en ce monde, sous la forme de la capitaine de la garde.', 'Se faire accepter par le roi Dragoliub, assurer une bonne fin de vie à Marcus Rondepointe ', 'Le décès de Marcus Rondepointe', 'Les croquettes, courir après les animaux', 'Recevoir des ordres, être traité différemment des autres pour sa nature de chien', 'Barrière mentale', 'Pas de poches', '???', 'La présence de nombreux esprits dans le corps de Clebopatre le rend plus résistant aux capacités de psychomancien. Il a un bonus de +30 aux jets de résistances sur la psychomancie', 'Malgré les apparences, Clebopatre n''est qu''un chien. Il ne peut pas transporter d''objet sur lui autrement qu''en les tenant dans sa gueule. Clebopatre va devoir se débrouiller pour convaincre les autres aventuriers de transporter des objets s''ils lui demandent de le faire', '/Unknown', 60, 80, 100, true, 0);
+INSERT INTO public."Character" (id, name, title, age, "mainClassId", "secondClassId", vitality, mana, strength, dexterity, courage, charisma, perception, discretion, knowledge, destiny, "publicStory", "privateStory", motivations, fears, "like", dislike, "talentName", "weaknessName", inventory, "talentDescription", "weaknessDescription", "picturePath", "currentVitality", "currentMana", corruption, selectable, "currentCorruption") VALUES (8, 'Sanae', 'Chasseuse tribale', 31, 1, NULL, 60, 20, 50, 50, 60, 30, 80, 70, 30, 0, '	Depuis la nuit des temps, le peuple Koto-Hara se bat pour garder son indépendance. Après des années de conflits avec Syphania, un accord de paix durable fut établi. Ce fut le début d''une ère de collaboration et d''entraide entre Koto-Hara et Syphania, une ère qui aboutit sur l''union du roi Baham Dragoliub et de la cheffe Alma Piri-Piri.
+	LINEBREAK
+	De nos jours, bien que le peuple Koto-Hara soit resté totalement indépendant, de nombreux liens diplomatiques et commerciaux ont été établis. C''est ainsi que Sanae, une jeune chasseuse Koto-Hara, se retrouva à travailler à Carastelle. Elle chassait des proies et récoltait des ingrédients pour les taverniers et autres alchimistes de la capitale. Ses talents étaient si connus que les cuisiniers royaux faisaient parfois affaire avec elle.
+	LINEBREAK
+	Lorsque le roi Sergeï Dragoliub chercha à  assembler une équipe d''aventurier polyvalente pour sa mission, le nom de Sanae remonta rapidement à ses oreilles. Une chasseuse experte de la nature et de la traque pourrait être utile pour une mission aussi mystérieuse. C''est ainsi que Sanae fut recrutée dans cette toute nouvelle équipe.
+', 'Dans sa jeunesse, Sanae accompagna son père à Courneuve, une petite ville minière du Sud de Syphania. Un vieux biomancien avait commandé des espèces spécifiques à leurs régions pour des expériences de fusion. C''était la première fois que Sanae observait une magie de ce type, et bien que les visions de ces expériences la perturbaient, elles s''étaient gravées dans son esprit.
+	LINEBREAK
+	La veille de leur retour, ils furent agressés par des locaux. En effet, bien que les relations avec Koto-Hara était officiellement apaisées depuis quelques années déjà, certaines personnes ne les voyaient toujours pas d''un bon œil. Suite à cette agression, le père de Sanae fut blessé à la jambe, ce qui le força à arrêter ses activités commerciales pendant un temps. Sanae tira deux leçons de cette expérience. La première était que l''on ne pouvait jamais faire totalement confiance à quelqu''un, encore moins un Syphanien. Et par conséquence, il fallait être capable de vivre par soi-même, se défendre par soi-même, se suffire à soi-même.
+	LINEBREAK
+	Cette résolution la poussa à emprunter la voie de la chasse, un art ancestral chez les Koto-Hara. Elle s''inspira des fusions qu''elle avait pu voir chez le vieux biomancien pour développer sa propre philosophie de chasse: exploiter les forces de ses proies contre elles-mêmes. Au bout de plusieurs mois, elle fut reconnue comme la chasseuse la plus prometteuse de son village. Malgré son amour pour sa terre natale, Sanae fut contrainte d''aller vivre à Carastelle. En effet, son père avait besoin de quelqu''un pour y tenir le relai commercial de sa boutique, et il faisait entièrement confiance en sa fille.
+	LINEBREAK
+	Arrivée sur place, elle ouvra une boutique relai où on pouvait trouver des ressources disponibles uniquement en Koto-Hara. Cependant, la chasse l''appelait toujours, et elle répondait à cet appel la nuit. Pour agrémenter ses revenus, elle commença à vendre ses proies. Puis, elle accepta des requêtes spécifiques de clients. Au final, la chasse lui rapportait plus que le comptoir de son père. Elle abandonna son activité marchande (qui fut reprise par son cousin) et se dévoua complètement à la chasse', 'Faire connaitre son nom pour augmenter sa clientèle, faire taire les préjugés sur les Koto-Hara', 'Perdre son indépendance', 'La viande, la nature', 'Les discussions qui s''éternise, les espaces clôt', 'Experte de la traque', 'Malaise social', 'Paire de pâtes d''ours, corde', 'Sanae ressent instinctivement la présence d''êtres vivants aux alentours. Si elle essaie de les repérer, le jet de perception qu''elle effectue a un bonus de +30', 'Sanae a l''habitude de travailler seule. Tous ses jets subissent un malus de -30 si elle se trouve physiquement proche d''un membre du groupe (<=3m). La valeur de ce malus diminuera progressivement au cours de l''aventure.', '/Sanae', 60, 20, 100, false, 0);
+INSERT INTO public."Character" (id, name, title, age, "mainClassId", "secondClassId", vitality, mana, strength, dexterity, courage, charisma, perception, discretion, knowledge, destiny, "publicStory", "privateStory", motivations, fears, "like", dislike, "talentName", "weaknessName", inventory, "talentDescription", "weaknessDescription", "picturePath", "currentVitality", "currentMana", corruption, selectable, "currentCorruption") VALUES (9, 'Vell', 'Diplomate étrangère', 37, 9, NULL, 40, 20, 30, 40, 80, 70, 60, 60, 50, 0, 'Si l''on devait retenir une seule chose du siècle précédent, c''est probablement l''instauration d''une période de paix durable. Les divers royaumes de Fellam, las des combats incessants, effectuèrent de nombreux efforts de diplomatie pour rapprocher leurs peuples. Ces efforts ont bien failli être annihilés par le mage noir Zelox, mais la défaite de celui-ci par les représentants de Syphania marqua une étape importante dans l''histoire. Depuis ce jour, Syphania a prit une part plus importante dans les négociations entre les royaume, devenant un acteur incontournable. Les accords commerciaux  avec ce royaume se multipliaient, et de  nombreuses contreparties étaient assurées par Syphania.
+	LINEBREAK
+	Vell était une diplomate originaire du royaume de Kadol. Celle-ci travaillait avec la cours de Carastelle depuis un peu plus d''une dizaine d''année: elle fut à l''origine de nombreux accords très important pour son royaume, dont l''accord sur l''export de minéraux précieux récemment établi. Le roi Sergeï Dragoliub, ayant eu maintes occasion de collaborer avec elle, avait entièrement confiance en ses capacités et intentions. Il la recruta pour sa mission, se disant que ses talents de négociations et sa capacité à travailler sous pression serait d''excellents atouts pour cette équipe. De plus, il voyait en cette recrue l''occasion de renforcer ses liens avec Kadol', 'Les nombreuses batailles contre le mage noir Zelox avaient laissé de grosses séquelles. De nombreuses familles brisées, des enfants privés de leurs parents du jour au lendemain… Vell était une de ces enfants. Le roi Dragoliub, conscient des nombreuses blessures de son peuple, décida de tout faire pour prévenir de futurs drames. Il accueilli une partie des orphelins au château, un symbole fort pour un peuple jusqu''ici habitué à se remettre des catastrophes par lui même.
+	LINEBREAK
+	Cependant, ces enfants n''étaient pas accueillit uniquement par bonté. Sergeï tenait par dessus tout à ne plus subir ce genre de perte. Ainsi, lui et ses conseillers les plus proche formait en secret un petit groupe d''espions. Selon lui, la meilleur méthode pour achever une paix durable était de tuer les menaces dans l''œuf, et la collecte d''information était donc une priorité.
+	LINEBREAK
+	Ces enfants étaient tous éduqués pour pouvoir se fondre facilement dans les diners de haut-rang et autre évènements de la haute société.  Ils avaient également tous reçu un entrainement poussé en psychomancie d''infiltration, indispensable pour leur mission. Au bout de quelques années, ces enfants étaient tous devenus de redoutables espions. Cependant, une enfant se distinguait du reste: Flora Grantel.
+	LINEBREAK
+	La jeune fille avait été accueilli à ses 4 ans, aussi n''avait elle pas de souvenir de ses parents. Elle avait très vite montré des capacités très impressionnantes, à tel point que ses instructeurs avaient du mal à la canaliser. Lors d''un passage du roi et de la reine, Flora réussit à découvrir que celle-ci le trompait avec un duc de l''est. Cela causa un incident diplomatique sans précédant qui aboutit en l''exil de la reine et du duc.
+	LINEBREAK
+	Le roi, désolé, se retrancha plusieurs mois. Cependant, il vit le potentiel de cette jeune fille. Le jour de ses 9 ans, il décida de l''envoyer vivre en Kadol, un royaume voisins avec des tendances belliqueuses. Sa mission était de vivre dans le royaume, se faire passer pour une Kadolienne d''origine et d''être à l''affut de tout information pouvant menacer Syphania. Une mission que Flora remplit avec brio les 28 prochaines années de sa vie.
+	LINEBREAK
+	Elle changea d''identité pour adopter le nom de Vell, un nom avec une consonnance plus Kadolienne. Elle se fit adopter par un couple d''horlogers et s''immergea dans la culture locale. Elle les aidait au quotidien en gérant les ventes d''horloges. Ses 2 parents adoptifs constatèrent rapidement les capacités de Vell en négociation. Ils aidèrent Vell à acquérir un réseau professionnel, certains que la jeune fille avait un avenir dans le commerce. Années après années, le nom de Vell remontait dans les sphères de pouvoir. Le roi Bodobom Raltouf la contacta personnellement pour lui proposer un poste de diplomate à ses 21 ans, poste qu''elle accepta gracieusement. Depuis, elle est en charge des relations avec Syphania, ce qui lui offrait une opportunité parfaite pour retransmettre les informations qu''elle récupérait en Kadol. ', 'Le sens du devoir', 'L''échec, le fait d''être découverte', 'Les jeux de stratégie, le royaume de Syphania', 'Les personnes bornées, la xénophobie', 'Reine de la négociation', 'Façade permanente', 'Paire de gants de cuir, bourse d''or (5 pièces)', 'Vell reçoit un bonus de 20 lorsqu''elle négocie avec quelqu''un. Elle ignore également les échecs critique et peut entamer une négociation avec n''importe quel être vivant (sans barrière de langage) si celui ci y est ouvert', 'Vell ne vit que pour son devoir, masquant les apparences durant toute sa vie. Si quelqu''un suspecte qu''elle n''est pas réellement une diplomate de Kadol, elle perd l''ensemble de ses points de destin et subit un malus de -30 sur son prochain jet', '/Vell', 40, 20, 100, false, 0);
+INSERT INTO public."Character" (id, name, title, age, "mainClassId", "secondClassId", vitality, mana, strength, dexterity, courage, charisma, perception, discretion, knowledge, destiny, "publicStory", "privateStory", motivations, fears, "like", dislike, "talentName", "weaknessName", inventory, "talentDescription", "weaknessDescription", "picturePath", "currentVitality", "currentMana", corruption, selectable, "currentCorruption") VALUES (2, 'Marti', 'Maître saucissier', 45, 6, NULL, 20, 60, 50, 80, 60, 70, 50, 30, 30, 0, 'Le royaume de Syphania est bien vaste et contient de nombreuses villes, dont la fameuse Salford. Cette cité au creux des vallées nordiques est connue pour son climat particulièrement rude: il n''est pas rare de devoir affronter des blizzards pour s''y rendre. En contraste de ses températures glaciales, la ville jouit d''une population chaleureuse ayant un grand sens de l''accueil, de l''hospitalité et des traditions. La cuisine est probablement l''élément le plus important de la culture locale: manger était à la fois une source d''énergie, chaleur et réconfort. Ainsi, la culture culinaire de la région était très développée, axées principalement autour de plats riches et chauds.
+	LINEBREAK
+	Plus de la moitié de la population exerçait un métier plus ou moins proche de la nourriture. Pourtant, malgré le très grand nombre d''artisan travaillant dans ce domaine, un nom revenait plus régulièrement: Marti, le fameux "maitre saucissier". Au delà de sa réputation, Marti avait une caractéristique qui permettait de le distingue facilement: ses membres métalliques. Ces fameuses mains d''acier sont justement la clé de sa popularité. En effet, sa technique de cuisson de saucisses était plutôt originale: il les attrapait fermement et faisait chauffer ses phalanges métalliques.
+	LINEBREAK
+	L''origine de ses prothèses étaient cependant sujette à de multiples théories. La rumeur la plus populaire disait qu''il s''était perdu en montagne durant sa jeunesse, et que le froid lui avait pris ses bras et jambes. Un forgeron local aurait alors forgé ces prothèses d''acier. Pour autant, celui-ci n''avait jamais confirmé ou infirmé ces dires. Sergeï Dragoliub fit appel à lui pour sa mission. En effet, un groupe d''aventurier n''était rien sans nourriture, et les atouts métalliques de Marti pouvait devenir une force insoupçonnéeLINEBREAK		
+Plus de la moitié de la population exerçait un métier plus ou moins proche de la nourriture. Pourtant, malgré le très grand nombre d''artisan travaillant dans ce domaine, un nom revenait plus régulièrement: Marti, le fameux "maitre saucissier"
+LINEBREAK	
+Au delà de sa réputation, Marti avait une caractéristique qui permettait de le distingue facilement: ses membres métalliques. La rumeur disait qu''il s''était perdu en montagne durant sa jeunesse, et que le froid lui avait pris ses bras et jambes. Un forgeron local lui aurait alors forgé ces prothèses d''acier. Pour autant, celui-ci n''avait jamais confirmé ou infirmé la rumeur. Sergeï Dragoliub fit appel à lui pour sa mission. En effet, un groupe d''aventurier n''était rien sans nourriture, et les atouts métalliques de Marti pouvait devenir une force insoupçonnée', 'Fidgerald était un jeune adolescent bien en chair. Il aimait les plaisirs simples de la vie et raffolait de saucisses, dont il s''empiffrait régulièrement. Certains regardaient son corps avec dégout, dégout que Fidgerald tentait tant bien que mal d''ignorer. Après tout, les personnes avec qui il interagissait avaient généralement une opinion favorable de lui. Si seulement les gens pouvaient arrêter de le juger aussi hâtivement…
+	LINEBREAK
+	Un matin funeste, Fidgerald se réveilla dans une petite grange sombre. Lorsqu''il tenta de se lever, il constata qu''il était lié au sol par des chaines d''acier. Un vent de panique l''envahit alors. Il se débâta, cria, pleura… Mais rien n''y faisait. Au bout de quelques heures, un homme entra dans la grange et s''approcha de lui, une lueur malsaine perlant son regard. Fidgerald aperçu brièvement le paysage extérieur par l''ouverture de la porte, et constata avec effroi qu''il était bien loin de sa Salford natale. L''homme ne lui dit rien. Il se contenta de le rouer de coups et lui fournit de la nourriture en grande quantité, plus que ce à quoi on pourrait s''attendre pour un prisonnier. Aucune viande n''était au menu, mais c''était le moindre de ses soucis.
+	LINEBREAK
+	Cette routine se poursuivit jour après jour. Fidgerald, esclave de son sort, se réfugiait dans cette nourriture. Elle était sa seule source de confort, son seul bonheur dans un univers qui semblait toujours plus le haïr. Fidgerald perdit rapidement la notion du temps. La seule chose qu''il voyait évoluer était son corps: il était obèse et difforme, tel un animal que l''on engraissait.
+	LINEBREAK
+	Le sort n''avait pas finit de s''acharner sur le pauvre Fidgerald. Un soir fatidique, son tortionnaire entra dans la grange avec un hachoir à viande. Il déposa près de l''entrée un sac emplit de bijoux et autres pierres précieuses avant de s''avancer vers Fidgerald. Le récit de ce qu''il s''est passé cette nuit là est trop sordide pour être raconté. Au petit matin, Fidgerald gisait dans une mare de son propre sang, ses membres absents. Il vit brièvement son tortionnaire utiliser la biomancie de fusion sur ces membres découpés, se servant de toute cette graisse pour remodeler  son corps et changer complètement d''apparence. Il récupéra ensuite ce sac emplit de richesse, et disparu hors de la vue du jeune mutilé.
+	LINEBREAK
+	Quelques minutes après le départ de son malfaiteur, la porte de la grange s''ouvra à nouveau. Une vieille femme, alertée par les hurlements de douleurs qu''elle avait entendu la nuit précédente, fut confrontée à cette vision d''horreur. Elle transporta Fidgerald chez elle et le soigna jour après jour. Il s''agissait d''Olga, une tisserande locale. Elle contacta également un ami forgeron pour lui créer des prothèses personnalisées. Le jeune adolescent était bouleversé, terriblement reconnaissant des nombreux gestes de bonté de cette femme.
+	LINEBREAK
+	Les mois suivants, Fidgerald entreprit de perdre toute la graisse qui persistait sur son corps mutilé. Ce corps boursoufflé lui rappelait ses années de souffrance et cette terrible nuit. Il apprit à se servir de ses prothèses, apprenant l''élémancie d''altération pour les réparer plus facilement et exploiter au mieux leur potentiel. En dehors de ces études, il passait l''essentiel de ses journées à s''exercer. Il se récompensait occasionnellement avec des saucisses, ces fameuses saucisses qu''il n''avait plus mangé depuis son enfance en Salford. Au bout de quelques années, Fidgerald avait perdu tout excédent  de poids et se sentait prêt à retourner en ses terres natales. Il décida d''abandonner le nom Fidgerald pour celui de Marti, une manière pour lui d''entamer un nouveau chapitre, une nouvelle identité dissociée de son expérience traumatique. De retour à Salford, il devint maitre saucissier, redistribuant la moitié de ses bénéfices à Olga en gage de sa gratitude éternelle.', 'Faire connaître son commerce pour rembourser sa dette éternelle envers Olga', 'Être privé de ses mouvements', 'Les saucisses, le sport', 'Les chaines, les vieux endroits sombres', 'Corps d''acier', 'Traumatisme', '10 saucisses, flasque d''huile', 'Lorsqu''il est attaqué, Marti essaie de se protéger avec ses membres métalliques. Il lance un dé 100: LINEBREAK
+	- <33: Marti subit les dégâts
+	LINEBREAK
+	- 34 - 66: Les membres de Marti sont endommagés, il subit un malus de -5 à tous ses jets jusqu''à réparation. Malus cumulable jusqu''à ce que Marti répare ses membres. Les dégâts qu''ils subit ne peuvent dépasser la moitié de sa vitalité actuelle
+	LINEBREAK
+	- >67: Marti bloque parfaitement et ignore tous dégâts', 'Malgré les années, Marti est toujours troublé par ses souvenirs douloureux. Lorsqu''il se trouve dans le noir complet, il est tétanisé et ne peut rien faire (si ce n''est crier et pleurer)', '/Marti', 20, 60, 100, false, 0);
+INSERT INTO public."Character" (id, name, title, age, "mainClassId", "secondClassId", vitality, mana, strength, dexterity, courage, charisma, perception, discretion, knowledge, destiny, "publicStory", "privateStory", motivations, fears, "like", dislike, "talentName", "weaknessName", inventory, "talentDescription", "weaknessDescription", "picturePath", "currentVitality", "currentMana", corruption, selectable, "currentCorruption") VALUES (1, 'Bernhalt', 'Recrue prometteuse', 23, 2, NULL, 50, 40, 80, 60, 60, 50, 50, 20, 20, 0, 'La prestigieuse garde de Syphania entretient depuis des années une certaine vision de ce pays: l''ordre, la discipline et le courage en sont les maitres mots. Celle-ci est généralement appréciée par le peuple. Après tout, bon nombre de légendes ont fait office dans cette organisation. Theoryn lui même fut autrefois une simple recrue avant de devenir le pourfendeur de Zelox que l''on connait aujourd''hui.
+	LINEBREAK
+	Les plus méprisants diraient que les temps de paix ont rouillé cette unité d''élite, les rendant moins efficaces qu''à l''époque de la guerre. Et d''une certaine manière, c''était vrai. Pour autant, sous-estimer la garde serait une grave erreurs, et de nombreux malfrats l''ont appris à leurs dépends
+	LINEBREAK
+	Parmi ces honorables soldats, un nom revenait régulièrement: Bernhalt Strangard. Un jeune homme à fort caractère prêt à tout pour faire régner la justice, quitte à désobéir à ses supérieurs. Malgré tout, il fallait avouer que ses méthodes étaient efficaces. Le chef de la garde se plaignait souvent de lui auprès du roi: une recrue désobéissante était inutile à ses yeux, aussi compétente qu''elle soit. Intrigué, le roi Dragoliub décida de recruter Bernhalt dans la troupe d''aventuriers. Sa fougue serait peut-être plus utile dans un cadre moins strict, et ses capacités n''étaient plus à démontrer.	LINEBREAK	
+Les plus méprisants diraient que les temps de paix ont rouillé cette unité d''élite, les rendant moins efficaces qu''à l''époque de la guerre. Et d''une certaine manière, c''était vrai. Pour autant, sous-estimer la garde serait une grave erreurs, et de nombreux malfrats l''ont appris à leurs dépends
+	LINEBREAK	
+Parmi ces honorables soldats, un nom revenait régulièrement: Bernhalt Strangard. Un jeune homme à fort caractère prêt à tout pour faire régner la justice, quitte à désobéir à ses supérieurs. Malgré tout, il fallait avouer que ses méthodes étaient efficaces. Le chef de la garde se plaignait souvent de lui auprès du roi. Une recrue désobéissante était inutile à ses yeux, aussi compétente qu''elle soit. Intrigué, le roi Dragoliub décida de recruter Bernhalt dans l''équipe de recherche. Sa fougue serait peut-être plus utile dans un cadre moins strict, et ses capacités n''étaient plus à démontrer.', 'Il y a quelques années, un groupe de bandits sévissait dans l''ombre en Carastelle. On nommait cette organisation criminelle "Vedaz". C''est malfrats étaient soit disant impliqués dans des affaires de trafics d''êtres humains et d''esclavage. Certaines rumeurs parlaient même d''association avec le mage noir Zelox. Cependant, aucuns éléments concrets n''a été révélé aux yeux du public pour confirmer ces propos.
+	LINEBREAK
+	La mère de Bernhalt faisait parti des victimes de cette organisation. A l''époque de son abduction, le jeune enfant avait seulement 4 ans, aussi gardait-il peu de souvenirs de celle-ci. Les années qui suivirent furent dures pour Bernhalt, qui dû jongler entre peur et rage. Il gardait cependant espoir de revoir sa mère un jour, espoirs non partagés par son père, un homme bien plus pragmatique.
+	LINEBREAK
+	Ces maigres attentes furent anéanties lors de son dixième anniversaire. Des membres de la garde de Syphania vinrent les informer de la découverte du corps de sa mère. Celui-ci était méconnaissable. Nul ne savait quelles horribles traitement elle avait subit, mais une chose était sûre: elle avait terriblement souffert. Bernhalt ne fut pas autorisé à voir le corps, à la fois pour permettre aux érudits de trouver des informations sur sa dépouille et pour préserver le jeune adolescent de cette vision macabre.  Bernhalt supplia la garde de l''engager: il était prêt à tout pour venger sa mère et anéantir cette organisation. Malheureusement pour lui, Bernhalt était bien trop jeune, aussi les gardes furent contraint de refuser.
+	LINEBREAK
+	Cela ne l''arrêta pas, bien au contraire: Bernhalt passa les années suivantes à s''entrainer sans relâche, usant de la biomancie d''évolution pour améliorer ses capacités physiques. Il souhaitait être prêt pour le jour de sa vengeance. Ce jour n''arriverait malheureusement jamais: Vedaz fut démantelé avant même qu''il n''aie pu rejoindre la garde. Frustré d''avoir été impuissant dans tout cette affaire, Bernhalt décida quand même de rejoindre les défenseurs du peuple à son vingtième anniversaire. Il n''avait rien pu faire pour sa mère, mais il pouvait au moins s''assurer que l''histoire ne se répète pas. Il trouva en cette résolution un moyen d''honorer sa défunte mère', 'Faire régner la justice', 'Être trop faible pour avoir un impact', 'L''adrénaline, les entrainements', 'La paperasse, les réunions et débats', 'Héroïsme', 'Bravoure orgueilleuse', 'Espadon d''acier', 'Tous les jets de dés de Bernhalt ont un bonus de 20 si l''action associée a pour objectif/conséquence direct(e) d''aider un être innocent', 'Bernhalt ne supporte pas les injonctions qu''il considère comme étant couardes. S''il aperçoit des êtres identifiés comme étant assurément des ennemis, il court instinctivement de se confronter à eux (physiquement et/ou verbalement). S''il essaie de se restreindre, il perd l''ensemble de ses points de destin et subit un malus de -50 sur son prochain jet.', '/Bernhalt', 70, 40, 100, true, 0);
+
+
+--
+-- TOC entry 4837 (class 0 OID 16546)
+-- Dependencies: 218
+-- Data for Name: Class; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public."Class" (id, name, "classCategoryId", description) VALUES (9, 'Ecole de l''infiltration', 3, 'Permet au Psychomancien de s''introduire dans l''esprit de quelqu''un pour en extraire des informations tout en masquant sa présence');
+INSERT INTO public."Class" (id, name, "classCategoryId", description) VALUES (8, 'Ecole du contrôle', 3, 'Permet au Psychomancien de manipuler un esprit autre que le sien. Cela peut être de la manipulation directe (forcer quelqu''un à faire quelque chose) ou indirecte (faire passer des suggestions dans son esprit de manière à affecter son comportement sur le long terme, ajouter des souvenirs…).');
+INSERT INTO public."Class" (id, name, "classCategoryId", description) VALUES (7, 'Ecole de l''illusion', 3, 'Permet au Psychomancien d''influer sur l''esprit des autres pour court circuiter leurs sens et leur faire voir/entendre/toucher des choses qui n''existent pas réellement');
+INSERT INTO public."Class" (id, name, "classCategoryId", description) VALUES (6, 'Ecole de l''altération', 2, 'Permet à l''élémancien de modifier les caractéristiques physiques d''un élément (chaleur, densité, rugosité…)');
+INSERT INTO public."Class" (id, name, "classCategoryId", description) VALUES (5, 'Ecole de la télékinésie', 2, 'Permet à l''élémancien de mouvoir la matière sans contact physique (projeter un rocher, créer des vagues)');
+INSERT INTO public."Class" (id, name, "classCategoryId", description) VALUES (4, 'Ecole de la transmutation', 2, 'Permet à l''élémancien de modifier la structure de la matière pour changer un élément en un autre');
+INSERT INTO public."Class" (id, name, "classCategoryId", description) VALUES (3, 'Ecole de l''invocation', 1, 'Permet au biomancien de transmettre une partie de sa force vitale à un élément inerte pour le rendre vivant. La mort de cette invocation rend sa force vitale au biomancien. L''entité invoqué sera plus robuste si le biomancien est également élémancien. Le contrôle sur cette entité sera plus efficace si le biomancien est également psychomancien');
+INSERT INTO public."Class" (id, name, "classCategoryId", description) VALUES (2, 'Ecole de l''évolution', 1, 'Permet de renforcer les capacités physiques d''un être vivant (Résistance, force, vue, ouïe…) ou au contraire de les diminuer. Permet également de soigner.');
+INSERT INTO public."Class" (id, name, "classCategoryId", description) VALUES (1, 'Ecole de la fusion', 1, 'Permet au biomancien de fusionner plusieurs êtres vivants entre eux. Peut être utiliser sur tout type d''être vivant (humain, plantes, animaux, insectes…)');
+
+
+--
+-- TOC entry 4838 (class 0 OID 16553)
+-- Dependencies: 219
+-- Data for Name: ClassCategory; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public."ClassCategory" (id, name, description) VALUES (1, 'Biomancien', 'Un mage qui a la capacité d''affecter le vivant');
+INSERT INTO public."ClassCategory" (id, name, description) VALUES (2, 'Elemancien', 'Un mage qui à la capacité d''affecter les éléments inanimés');
+INSERT INTO public."ClassCategory" (id, name, description) VALUES (3, 'Psychomancien', 'Un mage qui a la capacité d''affecter l''esprit');
+
+
+--
+-- TOC entry 4841 (class 0 OID 16609)
+-- Dependencies: 222
+-- Data for Name: GameSession; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public."GameSession" ("isActive", "isCharacterSelectionAllowed", id) VALUES (true, true, 1);
+
+
+--
+-- TOC entry 4843 (class 0 OID 16646)
+-- Dependencies: 224
+-- Data for Name: TextDisplay; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public."TextDisplay" (id, title, core) VALUES (1, 'Auberge, jour 1', 'Coucou bande de nouilles');
+
+
+--
+-- TOC entry 4839 (class 0 OID 16580)
+-- Dependencies: 220
+-- Data for Name: User; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public."User" (id, name, password, "roleId", "characterId", "isConnected") OVERRIDING SYSTEM VALUE VALUES (1, 'Maitre Wouf', 'holagatito', 1, NULL, false);
+
+
+--
+-- TOC entry 4840 (class 0 OID 16587)
+-- Dependencies: 221
+-- Data for Name: UserRole; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public."UserRole" (id, role) VALUES (1, 'dm');
+INSERT INTO public."UserRole" (id, role) VALUES (2, 'player');
+
+
+--
+-- TOC entry 4850 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: User_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public."User_id_seq"', 11, true);
+
+
+--
+-- TOC entry 4670 (class 2606 OID 16537)
+-- Name: Character Character_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Character"
+    ADD CONSTRAINT "Character_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4677 (class 2606 OID 16559)
+-- Name: ClassCategory ClassCategory_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."ClassCategory"
+    ADD CONSTRAINT "ClassCategory_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4674 (class 2606 OID 16552)
+-- Name: Class Class_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Class"
+    ADD CONSTRAINT "Class_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4683 (class 2606 OID 16615)
+-- Name: GameSession GameSession_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."GameSession"
+    ADD CONSTRAINT "GameSession_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4685 (class 2606 OID 16652)
+-- Name: TextDisplay TextDisplay_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."TextDisplay"
+    ADD CONSTRAINT "TextDisplay_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4681 (class 2606 OID 16593)
+-- Name: UserRole UserRole_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."UserRole"
+    ADD CONSTRAINT "UserRole_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4679 (class 2606 OID 16586)
+-- Name: User User_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."User"
+    ADD CONSTRAINT "User_pkey" PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4671 (class 1259 OID 16571)
+-- Name: fki_class; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX fki_class ON public."Character" USING btree ("mainClassId");
+
+
+--
+-- TOC entry 4675 (class 1259 OID 16565)
+-- Name: fki_class_category; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX fki_class_category ON public."Class" USING btree ("classCategoryId");
+
+
+--
+-- TOC entry 4672 (class 1259 OID 16577)
+-- Name: fki_second_class; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX fki_second_class ON public."Character" USING btree ("secondClassId");
+
+
+--
+-- TOC entry 4686 (class 2606 OID 16566)
+-- Name: Character Character_classId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Character"
+    ADD CONSTRAINT "Character_classId_fkey" FOREIGN KEY ("mainClassId") REFERENCES public."Class"(id) NOT VALID;
+
+
+--
+-- TOC entry 4687 (class 2606 OID 16572)
+-- Name: Character Character_secondClassId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Character"
+    ADD CONSTRAINT "Character_secondClassId_fkey" FOREIGN KEY ("secondClassId") REFERENCES public."Class"(id) NOT VALID;
+
+
+--
+-- TOC entry 4688 (class 2606 OID 16560)
+-- Name: Class Class_classCategoryId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Class"
+    ADD CONSTRAINT "Class_classCategoryId_fkey" FOREIGN KEY ("classCategoryId") REFERENCES public."ClassCategory"(id) NOT VALID;
+
+
+--
+-- TOC entry 4689 (class 2606 OID 16599)
+-- Name: User User_characterId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."User"
+    ADD CONSTRAINT "User_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES public."Character"(id) NOT VALID;
+
+
+--
+-- TOC entry 4690 (class 2606 OID 16594)
+-- Name: User User_roleId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."User"
+    ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES public."UserRole"(id) NOT VALID;
+
+
+-- Completed on 2025-10-12 14:20:10
+
+--
+-- PostgreSQL database dump complete
+--
+

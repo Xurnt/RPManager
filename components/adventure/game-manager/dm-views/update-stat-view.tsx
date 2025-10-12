@@ -85,6 +85,7 @@ export function UpdateStatView(
 	}
 
 	socket.on("updateStatsClient", () => {
+		socket.emit("getCharactersServer")
 		updateInteraction(MenuType.Main, false)
 	})
 	
