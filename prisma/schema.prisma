@@ -92,3 +92,9 @@ model GameSession {
   isCharacterSelectionAllowed Boolean
   id                          Int     @id
 }
+
+model TextDisplay {
+  id    Int     @id
+  title String?
+  core  String?
+}

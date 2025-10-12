@@ -4,7 +4,10 @@ import * as React from "react"
 import {
   BookOpen,
   Bot,
-  SquareTerminal,
+  Dices,
+	Swords,
+	PersonStanding,
+	WandSparkles 
 } from "lucide-react"
 
 import { NavMain } from "@/components/sidebar/nav-main"
@@ -32,12 +35,12 @@ export function AppSidebar({ ...props }: DataDrivenSidebar) {
      	title: "Aventure",
 			page: Pages.Home,
       url: "#",
-      icon: SquareTerminal,
+      icon: Dices,
 		},
     {
       title: "Personnages",
       url: "#",
-      icon: SquareTerminal,
+      icon: PersonStanding,
 			page: Pages.Character,
       items: props.characters.map(
 				(character:Character) => (
@@ -51,7 +54,7 @@ export function AppSidebar({ ...props }: DataDrivenSidebar) {
     {
       title: "Classes",
       url: "#",
-      icon: Bot,
+      icon: WandSparkles ,
 			page: Pages.Class,
       items: props.classcategories.map(
 				(classCategory:ClassCategory) => (
@@ -70,16 +73,8 @@ export function AppSidebar({ ...props }: DataDrivenSidebar) {
       items: [
         {
           title: "Introduction",
-        },
-        {
-          title: "Get Started",
-        },
-        {
-          title: "Tutorials",
-        },
-        {
-          title: "Changelog",
-        },
+					dataId: 1
+        }
       ],
     }
   ],

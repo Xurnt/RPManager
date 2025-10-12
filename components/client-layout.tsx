@@ -8,6 +8,7 @@ import { Character, Class, ClassCategory, GameSession, User, UserRole } from "@p
 import { DataPages, Pages } from "@/data/pages";
 import { CharacterClass } from "./character-class/character-class";
 import { CharacterComponent } from "./characters/character";
+import Intro from "./intro";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { LoginForm } from "./login-form";
@@ -21,7 +22,7 @@ export interface ClientLayoutProps {
 	classCategories:ClassCategory[],
 	classes:Class[],
 	users: (User & {UserRole:UserRole})[],
-	gameSession: GameSession | null
+	gameSession: GameSession
 }
 
 export interface UserData {
@@ -46,6 +47,7 @@ export function ClientLayout(
 	const [isFetching, setIsFetching] = useState<boolean>(true)
 	const [charactersState, setCharactersState] = useState<Character[]>(characters)
 	const [usersState, setUsersState] = useState<(User & {UserRole:UserRole})[]>(users)
+	const [gameSessionState, setGameSessionState] = useState<GameSession>(gameSession)
 
   useEffect(() => {
 		if (cookie.jwt) {
@@ -112,7 +114,10 @@ export function ClientLayout(
 		}
 	})
 
-	
+	socket.on("getGameSessionClient",  (data:GameSession) => {
+		console.log("UPDATE GAME SESSION")
+		setGameSessionState(data)
+	})
 
 	socket.on("updateStatsClient", () => {
 		socket.emit("getCharactersServer")
@@ -162,7 +167,7 @@ export function ClientLayout(
 					</DialogContent>
 					<div className="flex flex-1 flex-col gap-4 p-14 pt-0">
 						{dataPage.page == Pages.Home?
-							gameSession?
+							gameSessionState?
 								isFetching
 								?
 								<div className="flex justify-center items-center h-full">
@@ -175,12 +180,20 @@ export function ClientLayout(
 											/>
 								</div>
 								:
-									<AdventureLayout gameSession={gameSession} users={usersState} characters={charactersState} userData={userData} />
+									<AdventureLayout
+										gameSession={gameSessionState}
+										users={usersState}
+										characters={charactersState}
+										userData={userData}
+										classes={classes}
+										categories={classCategories}
+									/>
 								:null
 							:null
 						}
 						{dataPage.page == Pages.Character?
 							<CharacterComponent
+								gameSession={gameSessionState}
 								classes={classes}
 								character={charactersState.filter((character:Character)=>character.id == dataPage.dataId)[0]}
 								userData={userData}
@@ -196,7 +209,16 @@ export function ClientLayout(
 								/>
 							: null
 						}
-						{dataPage.page == Pages.World? <h1>World</h1> : null}
+						{
+							dataPage.page == Pages.World?
+								dataPage.dataId == 1
+								?
+									<Intro />
+								:
+									null
+							:
+								null
+						}
 					</div>
 				</SidebarInset>
 			</SidebarProvider>

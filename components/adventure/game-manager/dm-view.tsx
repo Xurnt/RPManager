@@ -1,15 +1,16 @@
 import { Character, GameSession } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { RollCreationView } from "./dm-views/roll-creation-view";
 import { RollView } from "./roll-view";
 import { DiceRollData } from "@/sockets/dice";
 import { UserData } from "@/components/client-layout";
 import { socket } from "@/socket";
 import { RollType } from "@/data/roll";
-import { UpdateStat, UpdateType } from "@/data/stats";
+import { UpdateStat } from "@/data/stats";
 import { UpdateStatView } from "./dm-views/update-stat-view"
+import { UpdateTextView } from "./dm-views/update-text-view"
 import { DefaultPlayerInteraction, InteractionType } from "./dm-views/default-player-interaction"
 
 interface DmViewType {
@@ -33,7 +34,8 @@ export enum MenuType {
 	RollCreation,
 	RollView,
 	DisconnectPlayer,
-	UnselectCharacter
+	UnselectCharacter,
+	UpdateText
 }
 
 export function DmView(
@@ -50,23 +52,35 @@ export function DmView(
 		
 	}:DmViewType){
 
-	const [gameActive, setGameActive] = useState<boolean>(gameSession.isActive)
 	const [menuType, setMenuType] = useState<MenuType>(MenuType.Main)
 	const [rollMenuType, setRollMenuType] = useState<RollType>(RollType.Standard)
-	const [characterSelectability, setCharacterSelectability] = useState<boolean>(
-		characters.filter((character) => character.selectable).length > 0
-	)
+
 
 	async function toggleGameSession (status:boolean) {
-		const response = await fetch('/api/gameSessionUpdate', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({sessionId:gameSession.id, sessionStatus:status}),
-		})
-		if (response.status == 200) {
-			setGameActive(status)
-		}
+		// const response = await fetch('/api/gameSessionUpdate', {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({sessionId:gameSession.id, sessionStatus:status}),
+		// })
+		// if (response.status == 200) {
+		// 	setGameActive(status)
+		// }
+		socket.emit(
+			"updateGameSessionServer",
+			{
+				sessionId:gameSession.id,
+				sessionStatus:status
+			}
+		)
 	}
+
+	socket.on("updateGameSessionClient", () => {
+		socket.emit("getGameSessionServer", {sessionId:gameSession.id})
+	})
+
+	socket.on("updateCharacterSelectabilityClient", () => {
+		socket.emit("getGameSessionServer", {sessionId:gameSession.id})
+	})
 
 	const updateInteraction = (menu:MenuType, status:boolean = true) => {
 		setMenuType(menu)
@@ -88,14 +102,17 @@ export function DmView(
 	}
 
 	const handleCharacterSelectabilityToggle = (value:boolean) => {
-		setCharacterSelectability(value)
-		socket.emit("setCharacterSelectabilityServer", value)
+		socket.emit("updateCharacterSelectabilityServer",
+			{
+				sessionId: gameSession.id,
+				characterSelectable: value
+			})
 	}
 
 	return(
 		<>
 			{
-				!gameActive
+				!gameSession.isActive
 				?
 					<div className="flex justify-center items-center h-full">
 						<Button onClick={() => toggleGameSession(true)} className="text-xl p-6 cursor-pointer">Commencer la session</Button>
@@ -119,9 +136,10 @@ export function DmView(
 								<div className="flex justify-around w-full py-10 gap-8">
 									<div className="flex flex-1 flex-col justify-start gap-8">
 										<h1 className="text-center">Setup</h1>
-										<Toggle pressed={characterSelectability} onPressedChange={handleCharacterSelectabilityToggle} className="text-sm cursor-pointer text-white-500">Activer sélection de personnage</Toggle>
+										<Toggle pressed={gameSession.isCharacterSelectionAllowed} onPressedChange={handleCharacterSelectabilityToggle} className="text-sm cursor-pointer text-white-500">Activer sélection de personnage</Toggle>
 										<Button onClick={() => updateInteraction(MenuType.DisconnectPlayer)} className="text-sm cursor-pointer bg-green-600 text-white-500 hover:bg-green-900  hover:text-white-800">Déconnecter joueur</Button>
 										<Button onClick={() => updateInteraction(MenuType.UnselectCharacter)} className="text-sm cursor-pointer bg-indigo-600 text-white-500 hover:bg-indigo-900  hover:text-white-800">Désélectionner personnage</Button>
+										<Button onClick={() => updateInteraction(MenuType.UpdateText)} className="text-sm cursor-pointer bg-lime-700 text-white-500 hover:bg-lime-900  hover:text-white-800">Mettre à jour texte</Button>
 									</div>
 									<div className="flex flex-1 flex-col justify-start gap-8">
 										<h1 className="text-center">Stats</h1>
@@ -232,6 +250,15 @@ export function DmView(
 														interactionTargets={interactionTargets}
 														updateInteraction={updateInteraction}
 														interaction={InteractionType.UNSELECT_CHARACTER}
+													/>
+												:
+													null
+											}
+											{
+												menuType == MenuType.UpdateText
+												?
+													<UpdateTextView
+														updateInteraction={updateInteraction}
 													/>
 												:
 													null

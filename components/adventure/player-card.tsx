@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Character, User } from "@prisma/client"
+import { Character, Class, ClassCategory, User } from "@prisma/client"
 import { Progress } from "../ui/progress"
 import { Dispatch, SetStateAction } from "react"
 import { Avatar, AvatarImage } from "../ui/avatar"
@@ -21,7 +21,9 @@ interface PlayerCardProps {
 	className?:string,
 	setInteractionTargets:Dispatch<SetStateAction<Character[]>>
 	interactionTargets:Character[],
-	newInteraction:boolean
+	newInteraction:boolean,
+	classes:Class[],
+	categories:ClassCategory[]
 }
 
 export function PlayerCard(
@@ -32,7 +34,9 @@ export function PlayerCard(
 		isUserDm,
 		setInteractionTargets,
 		interactionTargets,
-		newInteraction
+		newInteraction,
+		classes,
+		categories
 	} : PlayerCardProps){
 
 		const addNewInteractionTarget = () => {
@@ -63,50 +67,43 @@ export function PlayerCard(
 						<AvatarImage className="flex object-cover" src={character.picturePath +"/thumbnail.jpg"} />
 					</TooltipTrigger>
 					<TooltipContent className="flex flex-col gap-2 max-w-[50vw] p-4">
+						<h4>Classes: </h4>
+						<div className="mx-5">
+							<h5>Principale: {
+								classes.filter((classValue) => classValue.id == character.mainClassId).map((classValue) => (
+									categories.filter((category) => category.id == classValue.classCategoryId).map((category) => (
+										classValue.name.replace("Ecole", category.name)
+									))
+								))
+							}
+							</h5>
+							<h5>Secondaire: {
+								classes.filter((classValue) => classValue.id == character.secondClassId).map((classValue) => (
+									categories.filter((category) => category.id == classValue.classCategoryId).map((category) => (
+										classValue.name.replace("Ecole", category.name)
+									))
+								))
+							}
+							</h5>
+						</div>
+							
 						<h4>Stats: </h4>
 						<div className="flex gap-2 mx-4">
-							<div className="flex flex-col items-center">
+							<div className="flex flex-col items-start">
 								<span className="pb-2">Vitalité: {character.vitality}</span>
 								<span className="pb-2">Mana: {character.mana}</span>
 								<span className="pb-2">Force: {character.strength}</span>
 								<span className="pb-2">Dextérité: {character.dexterity}</span>
 								<span className="pb-2">Sang-froid: {character.courage}</span>
 							</div>
-							<div className="pl-4 flex flex-col items-center justify-between">
+							<div className="pl-4 flex flex-col items-start justify-between">
 								<span className="pb-2">Charisme: {character.charisma}</span>
 								<span className="pb-2">Perception: {character.perception}</span>
 								<span className="pb-2">Discrétion: {character.discretion}</span>
 								<span className="pb-2">Savoir: {character.knowledge}</span>
 							</div>
 						</div>
-						{
-							isUserDm || isCurrentUser
-							?
-								<>
-									<div>
-										<h4>Talent: {character.talentName}</h4>
-											{character.talentDescription.split("LINEBREAK").map((paragraph, paragraphIndex) => (
-												<span
-													key={"talentParagraph" + paragraphIndex}
-													className="text-left mb-3 block">
-														{paragraph}
-												</span>
-											))}
-									</div>
-										<div>
-										<h4>Faiblesse: {character.weaknessName}</h4>
-											{character.weaknessDescription.split("LINEBREAK").map((paragraph, paragraphIndex) => (
-												<span
-													key={"weaknessParagraph" + paragraphIndex}
-													className="text-left mb-3 block">
-														{paragraph}
-												</span>
-											))}
-									</div>
-								</>
-							:
-								null
-						}
+						
 
 					</TooltipContent>
 				</Tooltip>

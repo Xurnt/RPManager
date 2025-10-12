@@ -1,4 +1,4 @@
-import { Character, GameSession, User } from "@prisma/client";
+import { Character, Class, ClassCategory, GameSession, User } from "@prisma/client";
 import { PlayerCard } from "./player-card";
 import { UserData } from "../client-layout";
 import { useEffect, useState } from "react";
@@ -18,10 +18,21 @@ interface PlayerLayoutProps {
 	users: User[]
 	characters: Character[]
 	userData:UserData | null
-	gameSession:GameSession
+	gameSession:GameSession,
+	classes:Class[],
+	categories:ClassCategory[]
 }
 
-export function AdventureLayout({users, characters, userData, gameSession}:PlayerLayoutProps){
+export function AdventureLayout(
+	{
+		users,
+		characters,
+		userData,
+		gameSession,
+		classes,
+		categories
+	}:PlayerLayoutProps
+){
 
 	const [interactionTargets, setInteractionTargets] = useState<Character[]>([])
 	const [orderedCharacters, setOrderedCharacters] = useState<Character[]>(characters)
@@ -93,6 +104,8 @@ export function AdventureLayout({users, characters, userData, gameSession}:Playe
 											interactionTargets={interactionTargets}
 											newInteraction={newInteraction}
 											setInteractionTargets={setInteractionTargets}
+											classes={classes}
+											categories={categories}
 										/>
 									</CarouselItem>
 								)))

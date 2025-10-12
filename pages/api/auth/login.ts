@@ -37,7 +37,7 @@ export default async function handler(
 					id: user[0].id,
 				},
 				data: {
-					isConnected: true,
+					isConnected: user[0].roleId != 1,
 				},
 			});
 			res.setHeader("Set-Cookie", cookie);

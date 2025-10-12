@@ -1,4 +1,4 @@
-import { Character, Class, ClassCategory } from "@prisma/client";
+import { Character, Class, ClassCategory, GameSession } from "@prisma/client";
 import { UserData } from "../client-layout";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import Image from "next/image";
@@ -13,6 +13,7 @@ interface CharacterProps {
 	classes:Class[],
 	categories:ClassCategory[]
 	character:Character,
+	gameSession:GameSession
 	userData:UserData | null
 }
 
@@ -22,11 +23,21 @@ export function CharacterComponent(
 		character,
 		classes,
 		userData,
-		categories
+		categories,
+		gameSession
 	}:CharacterProps
 ): React.ReactNode {
 
 	const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+	const [picture, setPicture] = useState<string>("fullPicture")
+
+	const togglePicture = () => {
+		if (picture == "fullPicture") {
+			setPicture("fullPictureAlt")
+		} else {
+			setPicture("fullPicture")
+		}
+	}
 
 	return (
 		<div className="h-full">
@@ -37,6 +48,18 @@ export function CharacterComponent(
 						<div className="pb-4">
 							<h1 className="scroll-m-20 text-left text-4xl font-bold tracking-tight text-balance">{character.name}</h1>
 							<h2 className="scroll-m-20 text-left text-xl italic tracking-tight text-balance">{character.title}</h2>
+						</div>
+						<div className="pr-3 pb-4">
+							<span className="text-xl">Age: </span>
+							<span className="text-xl">
+								{
+								character.age == -1
+								?
+									"???"
+								:
+									character.age
+								} ans
+							</span>
 						</div>
 						{
 							classes.filter(
@@ -115,18 +138,27 @@ export function CharacterComponent(
 					<div className="flex-1 flex flex-col">
 						<Card className="flex flex-col p-4">
 							<Image
-								src={character.picturePath +"/fullPicture.jpg"}
+								src={character.picturePath +"/" + picture +".jpg"}
 								alt={character.name +"Pic"}
 								className=""
 								width={1080}
 								height={1350}
 							/>
 							{
-								character.selectable && userData && userData.characterId == null
+								gameSession.isCharacterSelectionAllowed && character.selectable && userData && userData.characterId == null
 								?
 								<DialogTrigger onClick={() => setDialogOpen(true)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive font-bold cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3">
 									Sélectionner ce personnage
 								</DialogTrigger>
+								:
+									null
+							}
+							{
+								userData && (userData.characterId == character.id || userData.role == "dm") && character.id == 4
+								?
+									<Button onClick={togglePicture} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive font-bold cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3">
+										Voir apparence alternative
+									</Button>
 								:
 									null
 							}

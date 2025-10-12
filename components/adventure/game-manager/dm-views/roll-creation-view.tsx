@@ -8,7 +8,7 @@ import { Minus } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import { MenuType } from "../dm-view"
 import { socket } from "@/socket";
-import { BonusMalus, BonusMalusOperation, RollType, StatName, stats } from "@/data/roll"
+import { BonusMalus, BonusMalusOperation, RollType, RollStatName, stats } from "@/data/roll"
 import { IntegerUpdateOperation } from "@/data/operation"
 import { DiceRollData, DiceRollRequest } from "@/sockets/dice"
 
@@ -31,7 +31,7 @@ export function RollCreationView({
 	setRollData
 }:RollViewType){
 
-	const [stat, setStat] = useState<StatName>()
+	const [stat, setStat] = useState<RollStatName>()
 	const [bonusMalusValue, setBonusMalusValue] = useState<string>("")
 	const [bonusMalusIndex, setBonusMalusIndex] = useState<number>(1)
 	const [bonusMalusList, setBonusMalusList] = useState<BonusMalus[]>([])
@@ -51,7 +51,7 @@ export function RollCreationView({
 		}
 	}
 
-	const handleStatChange = (value:StatName) => {
+	const handleStatChange = (value:RollStatName) => {
 		setStat(value)
 	}
 

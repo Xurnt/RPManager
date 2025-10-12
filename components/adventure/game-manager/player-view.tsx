@@ -2,6 +2,7 @@ import { socket } from "@/socket";
 import { DiceRollData } from "@/sockets/dice";
 import { Dispatch, SetStateAction, useState } from "react";
 import { RollView } from "./roll-view";
+import { TextDisplayView } from "./text-display-view";
 import { UserData } from "@/components/client-layout";
 import { Character } from "@prisma/client";
 
@@ -42,6 +43,13 @@ export function PlayerView({
 
 	return(
 		<div className="flex flex-1 h-full">
+			{
+				playerView == PlayerViews.Main
+				?
+					<TextDisplayView />
+				:
+					null
+			}
 			{
 				playerView == PlayerViews.Roll
 				?

@@ -15,6 +15,10 @@ export default async function Home() {
 	});
 	const gameSession = await prisma.gameSession.findFirst()
   return (
-		<ClientProviders gameSession={gameSession} users={users} characters={characters} classCategories={classCategories} classes={classes} />
+		gameSession
+		?
+			<ClientProviders gameSession={gameSession} users={users} characters={characters} classCategories={classCategories} classes={classes} />
+		:
+			null
   );
 }
