@@ -16,7 +16,6 @@ import { useCookies } from 'react-cookie';
 import { AdventureLayout } from "./adventure/adventure-layout";
 import { ClipLoader } from "react-spinners";
 import { socket } from "@/socket";
-
 export interface ClientLayoutProps {
 	characters:Character[],
 	classCategories:ClassCategory[],

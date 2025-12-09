@@ -13,6 +13,9 @@ export default async function Home() {
 			UserRole: true,
 		},
 	});
+
+
+	
 	const gameSession = await prisma.gameSession.findFirst()
   return (
 		gameSession
